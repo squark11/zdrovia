@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Logowanie — Zdrovia</title>
+  <meta name="robots" content="noindex" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" />
+
+  <link rel="stylesheet" href="style/base.css" />
+  <link rel="stylesheet" href="style/layout.css" />
+  <link rel="stylesheet" href="style/components.css" />
+  <link rel="stylesheet" href="style/app.css" />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+</head>
+
+<body class="app-body">
+  <a class="skip-link" href="#main">Przejdź do treści</a>
+
+  <header class="app-header">
+    <div class="container app-header__inner">
+      <a class="brand" href="index.html" aria-label="Zdrovia — strona główna">
+        <span class="brand__mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="30" height="30" role="img">
+            <path d="M16 3C10 9 6 12.5 6 18a10 10 0 0 0 20 0c0-5.5-4-9-10-15Z" fill="#0E9F8E" />
+            <path d="M10.5 18h3l1.5-3.2 2.2 5 1.6-3.1h2.7" fill="none" stroke="#fff"
+                  stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+        <span class="brand__name">Zdrovia</span>
+      </a>
+      <div class="app-header__actions">
+        <a class="main-nav__login" href="index.html">← Strona główna</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="auth-wrap" id="main">
+    <div class="auth-card">
+      <h1 class="auth-card__title">Zaloguj się</h1>
+      <p class="auth-card__subtitle">Wpisz dane, aby wejść do swojego panelu.</p>
+
+      <div class="alert alert--error" id="form-alert" role="alert" hidden></div>
+
+      <form id="login-form" novalidate>
+        <div class="field">
+          <label class="field__label" for="email">Adres e-mail</label>
+          <input class="field__input" type="email" id="email" name="email"
+                 autocomplete="email" placeholder="jan@example.com"
+                 aria-describedby="email-error" required />
+          <span class="field__error" id="email-error" aria-live="polite"></span>
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="password">Hasło</label>
+          <input class="field__input" type="password" id="password" name="password"
+                 autocomplete="current-password" placeholder="••••••••"
+                 aria-describedby="password-error" required />
+          <span class="field__error" id="password-error" aria-live="polite"></span>
+        </div>
+
+        <button class="btn btn--primary btn--block btn--lg" type="submit" id="submit-btn">
+          Zaloguj się
+        </button>
+      </form>
+
+      <p class="auth-card__foot">
+        Nie masz konta? <a class="link" href="register.html">Załóż konto</a>
+      </p>
+
+      <!-- Konta demo — logowanie jednym kliknięciem (ułatwienie w projekcie) -->
+      <div class="demo-box">
+        <p class="demo-box__title">Konta demo — zaloguj jednym kliknięciem</p>
+        <div class="demo-box__btns">
+          <button class="btn btn--ghost" type="button" data-demo-email="pacjent@zdrovia.pl">
+            👤 Pacjent demo
+          </button>
+          <button class="btn btn--ghost" type="button" data-demo-email="anna.kowalska@zdrovia.pl">
+            🩺 Lekarz demo
+          </button>
+        </div>
+        <p class="demo-box__note">
+          <strong>pacjent@zdrovia.pl</strong> · <strong>anna.kowalska@zdrovia.pl</strong><br />
+          hasło dla obu: <strong>Haslo123!</strong>
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <script src="script/api.js" defer></script>
+  <script src="script/login.js" defer></script>
+</body>
+</html>

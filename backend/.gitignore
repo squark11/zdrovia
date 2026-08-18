@@ -1,0 +1,11 @@
+# Zależności
+node_modules/
+
+# Zmienne środowiskowe (sekrety) — użyj .env.example jako wzorca
+.env
+
+# Baza danych SQLite (generowana przez seed)
+data/
+*.db
+*.db-wal
+*.db-shm

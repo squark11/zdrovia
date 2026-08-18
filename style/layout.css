@@ -1,0 +1,315 @@
+/* =============================================================
+   layout.css
+   Szkielet strony: kontenery, header + nawigacja, menu mobilne,
+   stopka, przycisk „do góry".
+============================================================= */
+
+/* -------------------------------------------------------------
+   Kontener centrujący treść.
+------------------------------------------------------------- */
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--space-4);
+}
+.container--narrow { max-width: 760px; }
+
+@media (min-width: 768px) {
+  .container { padding-inline: var(--space-6); }
+}
+
+/* Rytm sekcji */
+.section {
+  padding-block: var(--space-8);
+}
+@media (min-width: 768px) {
+  .section { padding-block: var(--space-9); }
+}
+.section--tint { background: var(--c-primary-tint); }
+
+/* =============================================================
+   HEADER
+============================================================= */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: saturate(180%) blur(12px);
+  border-bottom: 1px solid transparent;
+  transition: box-shadow var(--transition), border-color var(--transition),
+              background var(--transition);
+}
+/* Klasa dodawana w JS po przewinięciu */
+.site-header.is-scrolled {
+  box-shadow: var(--shadow-sm);
+  border-bottom-color: var(--c-line);
+}
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--header-h);
+  gap: var(--space-4);
+}
+
+/* Logo / marka */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-weight: 800;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+  color: var(--c-ink);
+}
+.brand__mark { display: inline-flex; }
+.brand--light { color: #fff; }
+
+/* -------------------------------------------------------------
+   Nawigacja (desktop).
+------------------------------------------------------------- */
+.main-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+.main-nav__list {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+.main-nav__link {
+  position: relative;
+  font-weight: 600;
+  color: var(--c-ink-soft);
+  padding-block: 0.4rem;
+  transition: color var(--transition);
+}
+.main-nav__link::after {
+  content: "";
+  position: absolute;
+  left: 0; bottom: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--c-primary);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--transition);
+}
+.main-nav__link:hover,
+.main-nav__link.is-active { color: var(--c-primary-dark); }
+.main-nav__link:hover::after,
+.main-nav__link.is-active::after { transform: scaleX(1); }
+
+/* -------------------------------------------------------------
+   Hamburger — widoczny tylko na mobile.
+------------------------------------------------------------- */
+.nav-toggle {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 44px;
+  height: 44px;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+}
+.nav-toggle__bar {
+  display: block;
+  width: 100%;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--c-ink);
+  transition: transform var(--transition), opacity var(--transition);
+}
+/* Animacja w „X" po otwarciu */
+.nav-toggle[aria-expanded="true"] .nav-toggle__bar:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.nav-toggle[aria-expanded="true"] .nav-toggle__bar:nth-child(2) { opacity: 0; }
+.nav-toggle[aria-expanded="true"] .nav-toggle__bar:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* -------------------------------------------------------------
+   MOBILE (< 900px): nawigacja jako rozwijany panel.
+------------------------------------------------------------- */
+@media (max-width: 899px) {
+  .main-nav {
+    position: fixed;
+    inset: var(--header-h) 0 auto 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-4);
+    padding: var(--space-5) var(--space-4) var(--space-6);
+    background: var(--c-surface);
+    border-bottom: 1px solid var(--c-line);
+    box-shadow: var(--shadow-md);
+    /* Ukryte domyślnie — chowamy nad ekran */
+    transform: translateY(-130%);
+    transition: transform 320ms var(--ease);
+    visibility: hidden;
+  }
+  .main-nav.is-open {
+    transform: translateY(0);
+    visibility: visible;
+  }
+  .main-nav__list {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-2);
+  }
+  .main-nav__link {
+    display: block;
+    padding: 0.75rem 0.5rem;
+    font-size: 1.1rem;
+    border-bottom: 1px solid var(--c-line-soft);
+  }
+  .main-nav__link::after { display: none; }
+  .main-nav__cta { text-align: center; margin-top: var(--space-2); }
+}
+
+/* DESKTOP (>= 900px): chowamy hamburger, pokazujemy pełną nawigację */
+@media (min-width: 900px) {
+  .nav-toggle { display: none; }
+  .main-nav { transform: none !important; visibility: visible !important; }
+}
+
+/* Blokada scrolla tła gdy menu otwarte */
+body.no-scroll { overflow: hidden; }
+
+/* =============================================================
+   FOOTER
+============================================================= */
+.site-footer {
+  background: var(--c-ink);
+  color: #B7CEC8;
+  padding-block: var(--space-8) var(--space-6);
+}
+.site-footer a { color: #CFDDD9; transition: color var(--transition); }
+.site-footer a:hover { color: #fff; }
+
+.site-footer__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+}
+@media (min-width: 620px) {
+  .site-footer__grid {
+    grid-template-columns: 1.6fr 1fr 1fr 1fr;
+    gap: var(--space-6);
+  }
+}
+
+.site-footer__desc {
+  margin-top: var(--space-3);
+  max-width: 34ch;
+  font-size: 0.95rem;
+  color: #9FB8B2;
+}
+
+.site-footer__heading {
+  color: #fff;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: var(--space-4);
+}
+.site-footer__col ul { display: grid; gap: var(--space-3); font-size: 0.95rem; }
+
+/* Ikony społecznościowe */
+.social { display: flex; gap: var(--space-3); margin-top: var(--space-4); }
+.social__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px; height: 40px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.08);
+  color: #CFDDD9;
+  transition: background var(--transition), transform var(--transition);
+}
+.social__link:hover {
+  background: var(--c-primary);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.site-footer__disclaimer {
+  margin-top: var(--space-7);
+  padding: var(--space-4);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  color: #9FB8B2;
+  background: rgba(255, 255, 255, 0.03);
+}
+.site-footer__disclaimer strong { color: #fff; }
+
+.site-footer__bottom {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+  padding-top: var(--space-5);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.82rem;
+  color: #8AA39D;
+}
+
+/* =============================================================
+   Przycisk „do góry"
+============================================================= */
+.to-top {
+  position: fixed;
+  right: clamp(1rem, 3vw, 2rem);
+  bottom: clamp(1rem, 3vw, 2rem);
+  z-index: 90;
+  width: 46px; height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-pill);
+  background: var(--c-primary-dark);
+  color: #fff;
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity var(--transition), transform var(--transition),
+              background var(--transition);
+}
+.to-top.is-visible { opacity: 1; transform: none; }
+.to-top:hover { background: var(--c-primary-darker); }
+
+/* -------------------------------------------------------------
+   Akcje konta w nagłówku (logowanie / panel)
+------------------------------------------------------------- */
+.main-nav__auth {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+.main-nav__login {
+  font-weight: 600;
+  color: var(--c-ink-soft);
+  white-space: nowrap;
+  transition: color var(--transition);
+}
+.main-nav__login:hover { color: var(--c-primary-dark); }
+
+@media (max-width: 899px) {
+  .main-nav__auth {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-2);
+    width: 100%;
+  }
+  .main-nav__login {
+    padding: 0.6rem 0.5rem;
+    text-align: center;
+    border-bottom: 1px solid var(--c-line-soft);
+  }
+}

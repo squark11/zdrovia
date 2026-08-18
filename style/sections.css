@@ -1,0 +1,572 @@
+/* =============================================================
+   sections.css
+   Style poszczególnych sekcji strony (hero, kroki, specjalizacje,
+   lekarze, opinie, cennik, CTA końcowe). Mobile-first + breakpointy.
+============================================================= */
+
+/* -------------------------------------------------------------
+   Nagłówek sekcji (wspólny)
+------------------------------------------------------------- */
+.section-head { max-width: 640px; margin: 0 auto var(--space-7); text-align: center; }
+.section-head__eyebrow {
+  display: inline-block;
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-primary-dark);
+  margin-bottom: var(--space-2);
+}
+.section-head__title { margin-bottom: var(--space-3); }
+.section-head__lead { color: var(--c-ink-soft); font-size: 1.05rem; }
+
+/* =============================================================
+   HERO — pełnoszerokościowy baner (dostarczone zdjęcie w tle).
+   Mobile-first: zdjęcie jako zaokrąglony baner POD tekstem.
+   Desktop: zdjęcie wypełnia tło, tekst po lewej na gradientowej
+   „zasłonie" gwarantującej kontrast (WCAG AA).
+============================================================= */
+.hero {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(60% 55% at 90% 8%, var(--c-primary-tint) 0%, transparent 60%),
+    radial-gradient(50% 60% at 0% 100%, #FFF1EC 0%, transparent 55%),
+    var(--c-bg);
+}
+
+/* --- Wizual (mobile) --- */
+.hero__media {
+  position: relative;
+  margin: var(--space-6) var(--space-4) 0;
+}
+.hero__photo {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+/* Pływająca odznaka z oceną */
+.hero__badge {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  display: grid;
+  gap: 2px;
+  padding: 0.55rem 0.85rem;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.hero__badge-sub { font-size: 0.72rem; color: var(--c-ink-muted); }
+
+/* --- Treść --- */
+.hero__inner { padding-block: var(--space-7) var(--space-8); }
+.hero__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.85rem;
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--c-ink-soft);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-4);
+}
+.hero__title { margin-bottom: var(--space-4); }
+.hero__subtitle {
+  font-size: 1.1rem;
+  color: var(--c-ink-soft);
+  max-width: 46ch;
+  margin-bottom: var(--space-5);
+}
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+
+/* Pasek zaufania */
+.trust-bar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--c-line);
+  max-width: 560px;
+}
+.trust-bar__item { display: grid; gap: 2px; }
+.trust-bar__num {
+  font-size: clamp(1.3rem, 4vw, 1.7rem);
+  font-weight: 800;
+  color: var(--c-ink);
+  letter-spacing: -0.02em;
+}
+.trust-bar__label { font-size: 0.8rem; color: var(--c-ink-muted); line-height: 1.35; }
+
+/* --- Desktop: zdjęcie w tle, tekst po lewej --- */
+@media (min-width: 820px) {
+  .hero { display: flex; align-items: center; min-height: 580px; }
+
+  .hero__media {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    z-index: 0;
+  }
+  .hero__photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: right center;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  /* Zasłona: solidne tło po lewej → przezroczyste przy sylwetce lekarza */
+  .hero__media::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      var(--c-bg) 0%,
+      var(--c-bg) 30%,
+      rgba(246, 250, 249, 0.86) 46%,
+      rgba(246, 250, 249, 0.35) 60%,
+      transparent 72%
+    );
+  }
+  .hero__badge { left: auto; right: 6%; bottom: 12%; }
+
+  .hero__inner { position: relative; z-index: 1; padding-block: var(--space-8); }
+  .hero__content { max-width: 560px; }
+}
+
+/* Na największych ekranach dosuwamy zdjęcie ładniej i dajemy więcej oddechu */
+@media (min-width: 1200px) {
+  .hero { min-height: 620px; }
+  .hero__badge { right: 10%; }
+}
+
+/* =============================================================
+   KROKI „Jak to działa"
+============================================================= */
+.steps {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+  counter-reset: step;
+}
+@media (min-width: 560px) { .steps { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 980px) { .steps { grid-template-columns: repeat(4, 1fr); } }
+
+.step-card {
+  position: relative;
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6) var(--space-5) var(--space-5);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.step-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+
+.step-card__num {
+  position: absolute;
+  top: -16px; left: var(--space-5);
+  width: 40px; height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(135deg, var(--c-primary), var(--c-primary-dark));
+  color: #fff;
+  font-weight: 800;
+  box-shadow: var(--shadow);
+}
+.step-card__icon {
+  display: inline-grid;
+  place-items: center;
+  width: 48px; height: 48px;
+  margin: var(--space-3) 0 var(--space-4);
+  border-radius: var(--radius);
+  background: var(--c-primary-tint);
+  color: var(--c-primary-dark);
+}
+.step-card__title { margin-bottom: var(--space-2); }
+.step-card__text { font-size: 0.95rem; }
+
+/* =============================================================
+   SPECJALIZACJE
+============================================================= */
+.specialty-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+}
+@media (min-width: 620px) { .specialty-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 900px) { .specialty-grid { grid-template-columns: repeat(4, 1fr); gap: var(--space-4); } }
+
+.specialty-grid__empty { grid-column: 1 / -1; text-align: center; color: var(--c-ink-muted); }
+
+.specialty-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+  /* Wypełnij całą komórkę siatki — równa szerokość i wysokość kart.
+     Bez tego <button> kurczy się do szerokości treści (różne szerokości). */
+  width: 100%;
+  height: 100%;
+  padding: var(--space-5) var(--space-4);
+  text-align: left;
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-lg);
+  transition: transform var(--transition), box-shadow var(--transition),
+              border-color var(--transition);
+  cursor: pointer;
+}
+.specialty-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--c-primary-tint-2);
+}
+.specialty-card__icon {
+  display: inline-grid;
+  place-items: center;
+  width: 52px; height: 52px;
+  border-radius: var(--radius);
+  background: var(--c-primary-tint);
+  color: var(--c-primary-dark);
+  transition: background var(--transition), color var(--transition);
+}
+.specialty-card:hover .specialty-card__icon {
+  background: var(--c-primary);
+  color: #fff;
+}
+.specialty-card__name { font-size: 1.02rem; font-weight: 700; color: var(--c-ink); }
+.specialty-card__count { font-size: 0.82rem; color: var(--c-ink-muted); margin-top: -6px; }
+
+/* =============================================================
+   LEKARZE
+============================================================= */
+.filters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+.filters__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: center;
+}
+.filters__count { text-align: center; font-size: 0.9rem; color: var(--c-ink-muted); }
+
+.doctor-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+@media (min-width: 560px) { .doctor-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 940px) { .doctor-grid { grid-template-columns: repeat(3, 1fr); } }
+
+.doctor-card {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-5);
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer; /* cała karta klikalna → modal profilu */
+  transition: transform var(--transition), box-shadow var(--transition),
+              border-color var(--transition);
+}
+.doctor-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--c-primary-tint-2);
+}
+
+.doctor-card__head { display: flex; align-items: center; gap: var(--space-3); }
+.doctor-card__avatar {
+  flex-shrink: 0;
+  width: 58px; height: 58px;
+  border-radius: var(--radius-pill);
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: #fff;
+}
+.doctor-card__name { font-size: 1.08rem; font-weight: 700; color: var(--c-ink); }
+.doctor-card__spec { font-size: 0.9rem; color: var(--c-primary-dark); font-weight: 600; }
+
+.doctor-card__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--c-line-soft);
+}
+.doctor-card__rating-count { color: var(--c-ink-muted); font-weight: 500; font-size: 0.82rem; }
+
+.doctor-card__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+.doctor-card__price { font-weight: 800; color: var(--c-ink); font-size: 1.05rem; }
+.doctor-card__price span { font-weight: 500; font-size: 0.8rem; color: var(--c-ink-muted); }
+
+.doctor-empty {
+  text-align: center;
+  padding: var(--space-7);
+  color: var(--c-ink-muted);
+  font-size: 1.05rem;
+}
+
+/* =============================================================
+   OPINIE
+============================================================= */
+.review-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+@media (min-width: 620px) { .review-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 940px) { .review-grid { grid-template-columns: repeat(3, 1fr); } }
+
+.review-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+.review-card__quote { color: var(--c-ink); font-size: 0.98rem; line-height: 1.55; flex: 1; }
+.review-card__foot { display: flex; align-items: center; gap: var(--space-3); margin-top: var(--space-2); }
+.review-card__avatar {
+  width: 42px; height: 42px;
+  border-radius: var(--radius-pill);
+  display: grid; place-items: center;
+  font-weight: 700; color: #fff; font-size: 0.9rem;
+}
+.review-card__name { font-weight: 700; color: var(--c-ink); font-size: 0.92rem; }
+.review-card__role { font-size: 0.8rem; color: var(--c-ink-muted); }
+
+/* =============================================================
+   CENNIK
+============================================================= */
+.pricing {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+  align-items: start;
+}
+@media (min-width: 820px) { .pricing { grid-template-columns: repeat(3, 1fr); } }
+
+.price-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-6) var(--space-5);
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.price-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+
+/* Wyróżniony plan */
+.price-card--featured {
+  border-color: var(--c-primary);
+  box-shadow: var(--shadow-md);
+}
+@media (min-width: 820px) {
+  .price-card--featured { transform: scale(1.04); }
+  .price-card--featured:hover { transform: scale(1.04) translateY(-4px); }
+}
+.price-card__badge {
+  position: absolute;
+  top: -13px; left: 50%;
+  transform: translateX(-50%);
+  padding: 0.3rem 0.9rem;
+  background: var(--c-accent);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+}
+.price-card__name { font-size: 1.25rem; margin-bottom: 2px; }
+.price-card__desc { font-size: 0.9rem; color: var(--c-ink-muted); margin-bottom: var(--space-4); }
+.price-card__price { margin-bottom: var(--space-4); }
+.price-card__amount { font-size: 2.4rem; font-weight: 800; color: var(--c-ink); letter-spacing: -0.03em; }
+
+.price-card__list {
+  display: grid;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+  flex: 1;
+}
+.price-card__list li {
+  position: relative;
+  padding-left: 1.75rem;
+  font-size: 0.94rem;
+}
+/* Znaczek „✓" przed każdą pozycją */
+.price-card__list li::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 2px;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--c-primary-tint)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%230B7A6D' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E")
+    center / 12px no-repeat;
+}
+.pricing__note {
+  margin-top: var(--space-5);
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--c-ink-muted);
+}
+
+/* =============================================================
+   CTA KOŃCOWE
+============================================================= */
+.cta-final { background: var(--c-bg); }
+.cta-final__box {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+  padding: clamp(1.5rem, 4vw, 3.5rem);
+  background:
+    radial-gradient(80% 120% at 100% 0%, rgba(255, 122, 89, 0.12) 0%, transparent 50%),
+    linear-gradient(135deg, var(--c-primary-darker) 0%, var(--c-primary-dark) 60%);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  color: #EAF7F4;
+}
+@media (min-width: 880px) {
+  .cta-final__box { grid-template-columns: 1.1fr 0.9fr; align-items: center; gap: var(--space-8); }
+}
+.cta-final__title { color: #fff; margin-bottom: var(--space-3); }
+.cta-final__lead { color: #CFEAE4; font-size: 1.05rem; margin-bottom: var(--space-5); max-width: 44ch; }
+.cta-final__perks { display: grid; gap: var(--space-2); }
+.cta-final__perks li { display: flex; align-items: center; gap: 0.6rem; color: #EAF7F4; font-weight: 500; }
+.cta-final__perks span {
+  display: inline-grid; place-items: center;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff; font-size: 0.75rem; font-weight: 800;
+}
+
+/* Karta formularza */
+.signup-form {
+  background: var(--c-surface);
+  border-radius: var(--radius-lg);
+  padding: clamp(1.25rem, 3vw, 2rem);
+  box-shadow: var(--shadow-lg);
+}
+.signup-form__title {
+  font-weight: 800;
+  font-size: 1.2rem;
+  color: var(--c-ink);
+  margin-bottom: var(--space-5);
+}
+.signup-form__success {
+  margin-top: var(--space-3);
+  padding: 0.85rem 1rem;
+  background: #E4F8EF;
+  color: #12805A;
+  font-weight: 600;
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+/* =============================================================
+   SPECJALIZACJE — wariant ciemny („immersyjny" baner z tłem).
+   Dostarczone zdjęcie sali z aparaturą jako tło, przyciemnione
+   teal-owym overlayem (spójność z marką) + karty typu „glass".
+   Biały tekst na ciemnym tle — kontrast > WCAG AA.
+============================================================= */
+.specialty-section {
+  position: relative;
+  isolation: isolate;
+  color: #fff;
+  /* Warstwy: gradientowy overlay (teal) NAD zdjęciem tła */
+  background-image:
+    linear-gradient(155deg,
+      rgba(6, 40, 37, 0.95) 0%,
+      rgba(9, 58, 52, 0.86) 48%,
+      rgba(5, 34, 31, 0.96) 100%),
+    url("../images/bg-specjalizacje.jpg");
+  background-size: cover, cover;
+  background-position: center, center 30%;
+  background-repeat: no-repeat, no-repeat;
+}
+/* Delikatna winieta dla głębi */
+.specialty-section::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(120% 90% at 50% 0%, transparent 55%, rgba(0, 0, 0, 0.35) 100%);
+  pointer-events: none;
+}
+
+/* Parallax tylko na desktopie (na mobile fixed bywa kłopotliwy) */
+@media (min-width: 900px) {
+  .specialty-section { background-attachment: scroll, fixed; }
+}
+
+/* Nagłówek sekcji w wersji jasnej */
+.specialty-section .section-head__eyebrow { color: #6FE9D3; }
+.specialty-section .section-head__title   { color: #fff; }
+.specialty-section .section-head__lead     { color: rgba(255, 255, 255, 0.82); }
+
+/* Karty specjalizacji — „frosted glass" */
+.specialty-section .specialty-card {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+}
+.specialty-section .specialty-card__icon {
+  background: rgba(18, 181, 160, 0.20);
+  color: #7FE9D6;
+}
+.specialty-section .specialty-card__name  { color: #fff; }
+.specialty-section .specialty-card__count { color: rgba(255, 255, 255, 0.6); }
+
+.specialty-section .specialty-card:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: var(--c-primary);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+}
+.specialty-section .specialty-card:hover .specialty-card__icon {
+  background: var(--c-primary);
+  color: #fff;
+}

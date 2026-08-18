@@ -1,0 +1,207 @@
+/* =============================================================
+   base.css
+   Reset, zmienne projektowe (design tokens), typografia, utility.
+   Podejście mobile-first — bazowe style dla najmniejszych ekranów,
+   rozszerzane w media queries (layout.css / sections.css).
+============================================================= */
+
+/* -------------------------------------------------------------
+   1. Zmienne — jeden spójny system kolorów, odstępów i cieni.
+   Kolor główny: miętowo-turkusowy (zaufanie, zdrowie).
+   Akcent: ciepły koral — „medyczny, ale ciepły".
+------------------------------------------------------------- */
+:root {
+  /* Kolory marki */
+  --c-primary:        #0E9F8E;
+  --c-primary-dark:   #0B7A6D;   /* hover / tekst na białym / kontrast AA */
+  --c-primary-darker: #0A5F55;
+  --c-primary-tint:   #E6F7F4;   /* jasne tło sekcji, ikony */
+  --c-primary-tint-2: #CFF3EC;
+
+  --c-accent:         #FF7A59;   /* ciepły akcent */
+  --c-accent-dark:    #E85E3D;
+
+  /* Neutralne (ciepłe odcienie, nie szpitalny chłód) */
+  --c-ink:        #14312D;   /* nagłówki, główny tekst */
+  --c-ink-soft:   #3E524E;   /* tekst drugorzędny (AA na białym) */
+  --c-ink-muted:  #64756F;   /* podpisy, mniej istotne */
+  --c-line:       #E2ECE9;   /* obramowania, separatory */
+  --c-line-soft:  #EEF4F2;
+  --c-bg:         #F6FAF9;   /* tło strony */
+  --c-surface:    #FFFFFF;   /* karty */
+  --c-ink-invert: #FFFFFF;
+
+  /* Kolor gwiazdek oceny */
+  --c-star: #FFB020;
+
+  /* Typografia */
+  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system,
+               "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  /* Skala odstępów (rytm pionowy 4px) */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --space-9: 6rem;
+
+  /* Zaokrąglenia */
+  --radius-sm: 8px;
+  --radius:    14px;
+  --radius-lg: 22px;
+  --radius-xl: 30px;
+  --radius-pill: 999px;
+
+  /* Cienie — delikatne, „ciepłe" (z odcieniem zieleni) */
+  --shadow-sm:  0 1px 2px rgba(20, 49, 45, 0.06);
+  --shadow:     0 6px 20px rgba(20, 49, 45, 0.08);
+  --shadow-md:  0 12px 34px rgba(20, 49, 45, 0.10);
+  --shadow-lg:  0 24px 60px rgba(20, 49, 45, 0.14);
+
+  /* Układ */
+  --container: 1160px;
+  --header-h: 72px;
+
+  /* Ruch */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --transition: 220ms var(--ease);
+}
+
+/* -------------------------------------------------------------
+   2. Reset — nowoczesny, minimalny.
+------------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+* { margin: 0; }
+
+html {
+  scroll-behavior: smooth;
+  /* Uwzględnij sticky header przy przewijaniu do kotwic */
+  scroll-padding-top: calc(var(--header-h) + 12px);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--c-ink-soft);
+  background: var(--c-bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+img, svg, picture { display: block; max-width: 100%; }
+
+button, input, textarea, select {
+  font: inherit;
+  color: inherit;
+}
+
+button { cursor: pointer; background: none; border: none; }
+
+ul, ol { list-style: none; padding: 0; }
+
+a { color: inherit; text-decoration: none; }
+
+/* -------------------------------------------------------------
+   3. Typografia — nagłówki ciasne i wyraziste, tekst czytelny.
+   clamp() zapewnia płynne skalowanie mobile → desktop.
+------------------------------------------------------------- */
+h1, h2, h3, h4 {
+  color: var(--c-ink);
+  line-height: 1.15;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+h1 { font-size: clamp(2.1rem, 5vw + 1rem, 3.6rem); }
+h2 { font-size: clamp(1.7rem, 3vw + 0.6rem, 2.6rem); }
+h3 { font-size: 1.2rem; font-weight: 700; }
+
+p { text-wrap: pretty; }
+
+strong { color: var(--c-ink); font-weight: 700; }
+
+/* -------------------------------------------------------------
+   4. Dostępność — focus i skip-link.
+------------------------------------------------------------- */
+
+/* Widoczny focus tylko przy nawigacji klawiaturą */
+:focus-visible {
+  outline: 3px solid var(--c-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+:focus:not(:focus-visible) { outline: none; }
+
+.skip-link {
+  position: absolute;
+  left: 50%;
+  top: -60px;
+  transform: translateX(-50%);
+  z-index: 200;
+  padding: 0.65rem 1.2rem;
+  background: var(--c-primary-dark);
+  color: #fff;
+  border-radius: 0 0 var(--radius) var(--radius);
+  font-weight: 600;
+  transition: top var(--transition);
+}
+.skip-link:focus { top: 0; }
+
+/* -------------------------------------------------------------
+   5. Utility.
+------------------------------------------------------------- */
+.text-gradient {
+  background: linear-gradient(100deg, var(--c-primary) 10%, var(--c-accent) 120%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.link {
+  color: var(--c-primary-dark);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.link:hover { color: var(--c-primary-darker); }
+
+/* Tylko dla czytników ekranu */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0);
+  white-space: nowrap; border: 0;
+}
+
+/* -------------------------------------------------------------
+   6. Animacja pojawiania się (Intersection Observer w JS dodaje
+   klasę .is-visible). Szanujemy prefers-reduced-motion.
+------------------------------------------------------------- */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 620ms var(--ease), transform 620ms var(--ease);
+  will-change: opacity, transform;
+}
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  [data-reveal] { opacity: 1; transform: none; transition: none; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

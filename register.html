@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rejestracja — Zdrovia</title>
+  <meta name="robots" content="noindex" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" />
+
+  <link rel="stylesheet" href="style/base.css" />
+  <link rel="stylesheet" href="style/layout.css" />
+  <link rel="stylesheet" href="style/components.css" />
+  <link rel="stylesheet" href="style/app.css" />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+</head>
+
+<body class="app-body">
+  <a class="skip-link" href="#main">Przejdź do treści</a>
+
+  <header class="app-header">
+    <div class="container app-header__inner">
+      <a class="brand" href="index.html" aria-label="Zdrovia — strona główna">
+        <span class="brand__mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="30" height="30" role="img">
+            <path d="M16 3C10 9 6 12.5 6 18a10 10 0 0 0 20 0c0-5.5-4-9-10-15Z" fill="#0E9F8E" />
+            <path d="M10.5 18h3l1.5-3.2 2.2 5 1.6-3.1h2.7" fill="none" stroke="#fff"
+                  stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+        <span class="brand__name">Zdrovia</span>
+      </a>
+      <div class="app-header__actions">
+        <a class="main-nav__login" href="index.html">← Strona główna</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="auth-wrap" id="main">
+    <div class="auth-card">
+      <h1 class="auth-card__title">Załóż konto</h1>
+      <p class="auth-card__subtitle">Dołącz do Zdrovia jako pacjent lub lekarz.</p>
+
+      <!-- Przełącznik roli -->
+      <div class="segmented" role="group" aria-label="Wybierz typ konta">
+        <button class="segmented__btn" type="button" data-role="patient" aria-pressed="true">
+          Jestem pacjentem
+        </button>
+        <button class="segmented__btn" type="button" data-role="doctor" aria-pressed="false">
+          Jestem lekarzem
+        </button>
+      </div>
+
+      <div class="alert alert--error" id="form-alert" role="alert" hidden></div>
+
+      <form id="register-form" novalidate>
+        <input type="hidden" name="role" id="role" value="patient" />
+
+        <!-- Wspólne -->
+        <div class="field">
+          <label class="field__label" for="firstName">Imię</label>
+          <input class="field__input" type="text" id="firstName" name="firstName"
+                 autocomplete="given-name" aria-describedby="firstName-error" required />
+          <span class="field__error" id="firstName-error" aria-live="polite"></span>
+        </div>
+        <div class="field">
+          <label class="field__label" for="lastName">Nazwisko</label>
+          <input class="field__input" type="text" id="lastName" name="lastName"
+                 autocomplete="family-name" aria-describedby="lastName-error" required />
+          <span class="field__error" id="lastName-error" aria-live="polite"></span>
+        </div>
+        <div class="field">
+          <label class="field__label" for="email">Adres e-mail</label>
+          <input class="field__input" type="email" id="email" name="email"
+                 autocomplete="email" aria-describedby="email-error" required />
+          <span class="field__error" id="email-error" aria-live="polite"></span>
+        </div>
+        <div class="field">
+          <label class="field__label" for="password">Hasło (min. 8 znaków)</label>
+          <input class="field__input" type="password" id="password" name="password"
+                 autocomplete="new-password" aria-describedby="password-error" required />
+          <span class="field__error" id="password-error" aria-live="polite"></span>
+        </div>
+
+        <!-- Pola pacjenta -->
+        <div class="role-fields" data-role="patient">
+          <div class="field">
+            <label class="field__label" for="phone">Telefon</label>
+            <input class="field__input" type="tel" id="phone" name="phone"
+                   autocomplete="tel" placeholder="+48 600 000 000"
+                   aria-describedby="phone-error" />
+            <span class="field__error" id="phone-error" aria-live="polite"></span>
+          </div>
+          <div class="field">
+            <label class="field__label" for="birthDate">Data urodzenia</label>
+            <input class="field__input" type="date" id="birthDate" name="birthDate"
+                   aria-describedby="birthDate-error" />
+            <span class="field__error" id="birthDate-error" aria-live="polite"></span>
+          </div>
+        </div>
+
+        <!-- Pola lekarza -->
+        <div class="role-fields" data-role="doctor" hidden>
+          <div class="field">
+            <label class="field__label" for="specialization">Specjalizacja</label>
+            <select class="field__input" id="specialization" name="specialization"
+                    aria-describedby="specialization-error">
+              <option value="">— wybierz —</option>
+              <option value="internista">Internista</option>
+              <option value="pediatra">Pediatra</option>
+              <option value="dermatolog">Dermatolog</option>
+              <option value="psychiatra">Psychiatra</option>
+              <option value="ginekolog">Ginekolog</option>
+              <option value="kardiolog">Kardiolog</option>
+              <option value="laryngolog">Laryngolog</option>
+              <option value="endokrynolog">Endokrynolog</option>
+            </select>
+            <span class="field__error" id="specialization-error" aria-live="polite"></span>
+          </div>
+          <div class="field">
+            <label class="field__label" for="pwzNumber">Numer PWZ</label>
+            <input class="field__input" type="text" id="pwzNumber" name="pwzNumber"
+                   placeholder="np. 1234567" aria-describedby="pwzNumber-error" />
+            <span class="field__error" id="pwzNumber-error" aria-live="polite"></span>
+          </div>
+          <div class="field">
+            <label class="field__label" for="city">Miasto</label>
+            <input class="field__input" type="text" id="city" name="city"
+                   placeholder="np. Warszawa" />
+          </div>
+          <div class="field">
+            <label class="field__label" for="yearsExperience">Lata doświadczenia</label>
+            <input class="field__input" type="number" id="yearsExperience" name="yearsExperience"
+                   min="0" max="70" placeholder="np. 10" />
+          </div>
+          <div class="field">
+            <label class="field__label" for="consultationPrice">Cena konsultacji (zł)</label>
+            <input class="field__input" type="number" id="consultationPrice" name="consultationPrice"
+                   min="0" max="100000" placeholder="np. 149" />
+          </div>
+          <div class="field">
+            <label class="field__label" for="bio">Krótkie bio</label>
+            <textarea class="field__input" id="bio" name="bio" rows="3"
+                      placeholder="Kilka zdań o Twojej praktyce…"></textarea>
+          </div>
+        </div>
+
+        <div class="field field--check">
+          <input class="field__checkbox" type="checkbox" id="consent" required />
+          <label class="field__consent" for="consent">
+            Akceptuję <a href="#" class="link">Regulamin</a> i
+            <a href="#" class="link">Politykę prywatności</a>.
+          </label>
+          <span class="field__error" id="consent-error" aria-live="polite"></span>
+        </div>
+
+        <button class="btn btn--primary btn--block btn--lg" type="submit" id="submit-btn">
+          Załóż konto
+        </button>
+      </form>
+
+      <p class="auth-card__foot">
+        Masz już konto? <a class="link" href="login.html">Zaloguj się</a>
+      </p>
+    </div>
+  </main>
+
+  <script src="script/api.js" defer></script>
+  <script src="script/register.js" defer></script>
+</body>
+</html>

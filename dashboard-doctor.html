@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel lekarza — Zdrovia</title>
+  <meta name="robots" content="noindex" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" />
+
+  <link rel="stylesheet" href="style/base.css" />
+  <link rel="stylesheet" href="style/layout.css" />
+  <link rel="stylesheet" href="style/components.css" />
+  <link rel="stylesheet" href="style/app.css" />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+</head>
+
+<body class="app-body">
+  <a class="skip-link" href="#main">Przejdź do treści</a>
+
+  <header class="app-header">
+    <div class="container app-header__inner">
+      <a class="brand" href="index.html" aria-label="Zdrovia — strona główna">
+        <span class="brand__mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="30" height="30" role="img">
+            <path d="M16 3C10 9 6 12.5 6 18a10 10 0 0 0 20 0c0-5.5-4-9-10-15Z" fill="#0E9F8E" />
+            <path d="M10.5 18h3l1.5-3.2 2.2 5 1.6-3.1h2.7" fill="none" stroke="#fff"
+                  stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+        <span class="brand__name">Zdrovia</span>
+      </a>
+      <div class="app-header__actions">
+        <span class="app-header__user" id="header-user"></span>
+        <a class="main-nav__login" href="index.html">Strona główna</a>
+        <button class="btn btn--ghost" type="button" id="logout-btn">Wyloguj</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="dash" id="main">
+    <div class="container">
+      <div class="dash-hero">
+        <h1 class="dash-hero__title" id="welcome">Panel lekarza</h1>
+        <p class="dash-hero__subtitle">Zarządzaj wizytami, dostępnością i wystawiaj e-recepty.</p>
+      </div>
+
+      <ul class="stat-tiles" aria-label="Podsumowanie">
+        <li class="stat-tile"><div class="stat-tile__value" id="stat-today">–</div><div class="stat-tile__label">Wizyty dziś</div></li>
+        <li class="stat-tile"><div class="stat-tile__value" id="stat-upcoming">–</div><div class="stat-tile__label">Zaplanowane</div></li>
+        <li class="stat-tile"><div class="stat-tile__value" id="stat-done">–</div><div class="stat-tile__label">Zrealizowane</div></li>
+        <li class="stat-tile"><div class="stat-tile__value" id="stat-rx">–</div><div class="stat-tile__label">Wystawione recepty</div></li>
+      </ul>
+
+      <div class="panel-grid">
+        <!-- LEWA: wizyty -->
+        <div>
+          <section class="panel" aria-labelledby="appts-title">
+            <div class="panel__head">
+              <h2 class="panel__title" id="appts-title">Twoje wizyty</h2>
+            </div>
+            <div class="panel__body">
+              <div class="data-list" id="appointments-list">
+                <div class="loading-row"><span class="spinner"></span> Wczytywanie…</div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- PRAWA: recepta + dostępność + profil -->
+        <div>
+          <section class="panel" aria-labelledby="rx-title">
+            <div class="panel__head"><h2 class="panel__title" id="rx-title">Wystaw e-receptę</h2></div>
+            <div class="panel__body">
+              <div class="alert alert--error" id="rx-alert" role="alert" hidden></div>
+              <div class="alert alert--success" id="rx-success" role="status" hidden></div>
+              <form id="rx-form" novalidate>
+                <div class="field">
+                  <label class="field__label" for="rx-appointment">Wizyta / pacjent</label>
+                  <select class="field__input" id="rx-appointment" required>
+                    <option value="">— wybierz wizytę —</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label class="field__label" for="rx-medication">Lek</label>
+                  <input class="field__input" id="rx-medication" placeholder="np. Amoksycylina 500 mg" required />
+                </div>
+                <div class="field">
+                  <label class="field__label" for="rx-dosage">Dawkowanie</label>
+                  <input class="field__input" id="rx-dosage" placeholder="np. 1 tabletka co 8 godzin" />
+                </div>
+                <div class="field">
+                  <label class="field__label" for="rx-notes">Uwagi</label>
+                  <textarea class="field__input" id="rx-notes" rows="2" placeholder="Zalecenia dla pacjenta…"></textarea>
+                </div>
+                <div class="field">
+                  <label class="field__label" for="rx-valid">Ważna do</label>
+                  <input class="field__input" type="date" id="rx-valid" />
+                </div>
+                <button class="btn btn--primary btn--block" type="submit" id="rx-submit">Wystaw receptę</button>
+              </form>
+            </div>
+          </section>
+
+          <section class="panel" aria-labelledby="avail-title">
+            <div class="panel__head"><h2 class="panel__title" id="avail-title">Dostępność</h2></div>
+            <div class="panel__body">
+              <div class="alert alert--success" id="avail-success" role="status" hidden></div>
+              <p class="data-item__sub" style="margin-bottom:var(--space-3)">
+                Zaznacz dni i godziny przyjmowania. Pacjenci zobaczą wolne 30-minutowe terminy.
+              </p>
+              <div id="avail-rows"></div>
+              <button class="btn btn--primary btn--block" type="button" id="avail-save"
+                      style="margin-top:var(--space-3)">Zapisz dostępność</button>
+            </div>
+          </section>
+
+          <section class="panel" aria-labelledby="profile-title">
+            <div class="panel__head"><h2 class="panel__title" id="profile-title">Profil</h2></div>
+            <div class="panel__body">
+              <div class="alert alert--success" id="profile-success" role="status" hidden></div>
+              <form id="profile-form" novalidate>
+                <div class="field">
+                  <label class="field__label" for="pf-city">Miasto</label>
+                  <input class="field__input" id="pf-city" />
+                </div>
+                <div class="field">
+                  <label class="field__label" for="pf-price">Cena konsultacji (zł)</label>
+                  <input class="field__input" type="number" id="pf-price" min="0" max="100000" />
+                </div>
+                <div class="field">
+                  <label class="field__label" for="pf-bio">Bio</label>
+                  <textarea class="field__input" id="pf-bio" rows="3"></textarea>
+                </div>
+                <button class="btn btn--ghost btn--block" type="submit">Zapisz profil</button>
+              </form>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="script/api.js" defer></script>
+  <script src="script/dash-common.js" defer></script>
+  <script src="script/dashboard-doctor.js" defer></script>
+</body>
+</html>

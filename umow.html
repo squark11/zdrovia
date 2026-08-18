@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Umów wizytę — Zdrovia</title>
+  <meta name="robots" content="noindex" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" />
+
+  <link rel="stylesheet" href="style/base.css" />
+  <link rel="stylesheet" href="style/layout.css" />
+  <link rel="stylesheet" href="style/components.css" />
+  <link rel="stylesheet" href="style/app.css" />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+</head>
+
+<body class="app-body">
+  <a class="skip-link" href="#main">Przejdź do treści</a>
+
+  <header class="app-header">
+    <div class="container app-header__inner">
+      <a class="brand" href="index.html" aria-label="Zdrovia — strona główna">
+        <span class="brand__mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="30" height="30" role="img">
+            <path d="M16 3C10 9 6 12.5 6 18a10 10 0 0 0 20 0c0-5.5-4-9-10-15Z" fill="#0E9F8E" />
+            <path d="M10.5 18h3l1.5-3.2 2.2 5 1.6-3.1h2.7" fill="none" stroke="#fff"
+                  stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+        <span class="brand__name">Zdrovia</span>
+      </a>
+      <div class="app-header__actions">
+        <span class="app-header__user" id="header-user"></span>
+        <a class="main-nav__login" href="dashboard-patient.html">Mój panel</a>
+        <button class="btn btn--ghost" type="button" id="logout-btn">Wyloguj</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="dash" id="main">
+    <div class="container container--narrow">
+      <a class="back-link" href="dashboard-patient.html">← Wróć do panelu</a>
+      <div class="dash-hero">
+        <h1 class="dash-hero__title">Umów wizytę / zamów usługę</h1>
+        <p class="dash-hero__subtitle">Kilka kroków dzieli Cię od konsultacji, e-recepty lub e-zwolnienia.</p>
+      </div>
+
+      <!-- Pasek postępu -->
+      <ol class="stepper" id="stepper" aria-label="Kroki rezerwacji">
+        <li class="stepper__item is-active" data-s="1"><span class="stepper__num">1</span><span class="stepper__label">Usługa</span></li>
+        <li class="stepper__item" data-s="2"><span class="stepper__num">2</span><span class="stepper__label">Lekarz</span></li>
+        <li class="stepper__item" data-s="3"><span class="stepper__num">3</span><span class="stepper__label">Termin</span></li>
+        <li class="stepper__item" data-s="4"><span class="stepper__num">4</span><span class="stepper__label">Szczegóły</span></li>
+        <li class="stepper__item" data-s="5"><span class="stepper__num">5</span><span class="stepper__label">Płatność</span></li>
+      </ol>
+
+      <div class="alert alert--error" id="wizard-alert" role="alert" hidden></div>
+
+      <div class="panel wizard" id="wizard">
+        <div class="panel__body">
+          <!-- KROK 1: usługa -->
+          <section class="wizard__step is-active" data-step="1" aria-labelledby="s1-title">
+            <h2 class="wizard__title" id="s1-title">Wybierz usługę</h2>
+            <div class="service-tiles" id="service-tiles"></div>
+          </section>
+
+          <!-- KROK 2: lekarz -->
+          <section class="wizard__step" data-step="2" aria-labelledby="s2-title" hidden>
+            <h2 class="wizard__title" id="s2-title">Wybierz lekarza</h2>
+            <div class="field">
+              <label class="field__label" for="wiz-spec">Specjalizacja</label>
+              <select class="field__input" id="wiz-spec"><option value="all">Wszystkie specjalizacje</option></select>
+            </div>
+            <div class="doctor-picker" id="doctor-cards"></div>
+          </section>
+
+          <!-- KROK 3: termin -->
+          <section class="wizard__step" data-step="3" aria-labelledby="s3-title" hidden>
+            <h2 class="wizard__title" id="s3-title">Wybierz termin i formę</h2>
+            <p class="field__label">Forma konsultacji</p>
+            <div class="choice-row" id="ctype-row">
+              <button class="choice" type="button" data-ctype="wideo" aria-pressed="true">📹 Wideo</button>
+              <button class="choice" type="button" data-ctype="czat" aria-pressed="false">💬 Czat</button>
+              <button class="choice" type="button" data-ctype="telefon" aria-pressed="false">📞 Telefon</button>
+            </div>
+            <p class="field__label" style="margin-top:var(--space-4)">Dostępne terminy</p>
+            <div id="wizard-slots">
+              <div class="loading-row"><span class="spinner"></span> Wczytywanie terminów…</div>
+            </div>
+          </section>
+
+          <!-- KROK 4: szczegóły / kwestionariusz -->
+          <section class="wizard__step" data-step="4" aria-labelledby="s4-title" hidden>
+            <h2 class="wizard__title" id="s4-title">Opisz powód wizyty</h2>
+            <div class="field">
+              <label class="field__label" for="wiz-reason">Objawy / powód (dla lekarza)</label>
+              <textarea class="field__input" id="wiz-reason" rows="4"
+                        placeholder="Np. od 3 dni ból gardła i gorączka 38°C…" aria-describedby="wiz-reason-error"></textarea>
+              <span class="field__error" id="wiz-reason-error" aria-live="polite"></span>
+            </div>
+            <div id="questionnaire"></div>
+            <div class="field field--check">
+              <input class="field__checkbox" type="checkbox" id="wiz-consent" />
+              <label class="field__consent" for="wiz-consent">
+                Oświadczam, że podane informacje są zgodne z prawdą i zapoznałem/am się z
+                <a href="#" class="link">informacją medyczną</a>.
+              </label>
+              <span class="field__error" id="wiz-consent-error" aria-live="polite"></span>
+            </div>
+          </section>
+
+          <!-- KROK 5: płatność -->
+          <section class="wizard__step" data-step="5" aria-labelledby="s5-title" hidden>
+            <h2 class="wizard__title" id="s5-title">Podsumowanie i płatność</h2>
+            <div class="order-summary" id="order-summary"></div>
+
+            <p class="field__label" style="margin-top:var(--space-4)">Metoda płatności</p>
+            <div class="choice-row" id="pay-row">
+              <button class="choice" type="button" data-pay="blik" aria-pressed="false">BLIK</button>
+              <button class="choice" type="button" data-pay="karta" aria-pressed="false">Karta</button>
+              <button class="choice" type="button" data-pay="przelew" aria-pressed="false">Szybki przelew</button>
+            </div>
+
+            <p class="pay-note">
+              🔒 To projekt demonstracyjny — <strong>płatność jest symulowana</strong>.
+              Nie podawaj prawdziwych danych karty ani logowania do banku.
+            </p>
+
+            <button class="btn btn--primary btn--block btn--lg" type="button" id="pay-btn" disabled>
+              Zapłać
+            </button>
+          </section>
+
+          <!-- Sukces -->
+          <section class="wizard__success" id="success" hidden aria-live="polite">
+            <div class="wizard__success-icon">✓</div>
+            <h2 class="wizard__title">Rezerwacja potwierdzona!</h2>
+            <p id="success-text"></p>
+            <a class="btn btn--primary btn--lg" href="dashboard-patient.html" style="margin-top:var(--space-4)">
+              Przejdź do panelu
+            </a>
+          </section>
+        </div>
+
+        <!-- Nawigacja -->
+        <div class="wizard__nav" id="wizard-nav">
+          <button class="btn btn--ghost" type="button" id="back-btn" disabled>Wstecz</button>
+          <button class="btn btn--primary" type="button" id="next-btn" disabled>Dalej</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="script/api.js" defer></script>
+  <script src="script/dash-common.js" defer></script>
+  <script src="script/services.js" defer></script>
+  <script src="script/umow.js" defer></script>
+</body>
+</html>

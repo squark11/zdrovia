@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- SEO / social -->
+  <title>Zdrovia — e-konsultacje i e-recepta online. Lekarz w 15 minut</title>
+  <meta name="description"
+        content="Zdrovia to nowoczesna platforma telemedyczna. Umów e-konsultację z lekarzem, otrzymaj e-receptę lub e-zwolnienie (L4) online, bez wychodzenia z domu." />
+  <meta name="theme-color" content="#0E9F8E" />
+
+  <meta property="og:title" content="Zdrovia — lekarz online w 15 minut" />
+  <meta property="og:description" content="E-konsultacje, e-recepta i e-zwolnienie online. Lekarze z całej Polski, dostępni 7 dni w tygodniu." />
+  <meta property="og:type" content="website" />
+
+  <!-- Typografia: jeden font z Google Fonts + systemowy fallback -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" />
+
+  <!-- Arkusze stylów podzielone na moduły logiczne -->
+  <link rel="stylesheet" href="style/base.css" />
+  <link rel="stylesheet" href="style/layout.css" />
+  <link rel="stylesheet" href="style/components.css" />
+  <link rel="stylesheet" href="style/sections.css" />
+
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+</head>
+
+<body>
+  <!-- Link pomijający nawigację — dostępność (WCAG 2.4.1) -->
+  <a class="skip-link" href="#main">Przejdź do treści</a>
+
+  <!-- ============================================================
+       HEADER — logo, nawigacja, CTA. Sticky obsługiwany w JS.
+  ============================================================= -->
+  <header class="site-header" id="site-header">
+    <div class="container site-header__inner">
+      <a class="brand" href="#top" aria-label="Zdrovia — strona główna">
+        <span class="brand__mark" aria-hidden="true">
+          <!-- Logo: puls w kropli -->
+          <svg viewBox="0 0 32 32" width="32" height="32" role="img">
+            <path d="M16 3C10 9 6 12.5 6 18a10 10 0 0 0 20 0c0-5.5-4-9-10-15Z"
+                  fill="url(#brandGrad)" />
+            <path d="M10.5 18h3l1.5-3.2 2.2 5 1.6-3.1h2.7"
+                  fill="none" stroke="#fff" stroke-width="1.7"
+                  stroke-linecap="round" stroke-linejoin="round" />
+            <defs>
+              <linearGradient id="brandGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#12B5A0" />
+                <stop offset="1" stop-color="#0B7A6D" />
+              </linearGradient>
+            </defs>
+          </svg>
+        </span>
+        <span class="brand__name">Zdrovia</span>
+      </a>
+
+      <!-- Nawigacja główna -->
+      <nav class="main-nav" id="main-nav" aria-label="Nawigacja główna">
+        <ul class="main-nav__list">
+          <li><a class="main-nav__link" href="#specjalizacje">Specjalizacje</a></li>
+          <li><a class="main-nav__link" href="#jak-to-dziala">Jak to działa</a></li>
+          <li><a class="main-nav__link" href="#cennik">Cennik</a></li>
+          <li><a class="main-nav__link" href="#faq">FAQ</a></li>
+        </ul>
+        <div class="main-nav__auth" id="nav-auth">
+          <a class="main-nav__login" href="login.html">Zaloguj się</a>
+          <a class="btn btn--primary main-nav__cta" href="#lekarze">Umów wizytę</a>
+        </div>
+      </nav>
+
+      <!-- Przycisk menu mobilnego (hamburger) -->
+      <button class="nav-toggle" id="nav-toggle"
+              aria-label="Otwórz menu" aria-expanded="false" aria-controls="main-nav">
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Kotwica na samą górę -->
+  <span id="top"></span>
+
+  <main id="main">
+
+    <!-- ==========================================================
+         HERO
+    =========================================================== -->
+    <section class="hero" aria-labelledby="hero-title">
+
+      <div class="container hero__inner">
+        <div class="hero__content" data-reveal>
+          <p class="hero__eyebrow">
+            <span class="dot dot--live" aria-hidden="true"></span>
+            Lekarze online 7 dni w tygodniu
+          </p>
+          <h1 class="hero__title" id="hero-title">
+            Lekarz online.<br />
+            <span class="text-gradient">E-recepta w 15 minut.</span>
+          </h1>
+          <p class="hero__subtitle">
+            Umów e-konsultację, opisz objawy i odbierz e-receptę lub
+            e-zwolnienie (L4) — bez kolejek i bez wychodzenia z domu.
+            Wygodnie, bezpiecznie, o każdej porze.
+          </p>
+
+          <div class="hero__actions">
+            <a class="btn btn--primary btn--lg" href="#lekarze">Umów wizytę</a>
+            <a class="btn btn--ghost btn--lg" href="#jak-to-dziala">
+              Zobacz, jak to działa
+            </a>
+          </div>
+
+          <!-- Pasek zaufania -->
+          <ul class="trust-bar" aria-label="Nasze liczby">
+            <li class="trust-bar__item">
+              <strong class="trust-bar__num" data-count="52000" data-suffix="+">0</strong>
+              <span class="trust-bar__label">zrealizowanych wizyt</span>
+            </li>
+            <li class="trust-bar__item">
+              <strong class="trust-bar__num">100%</strong>
+              <span class="trust-bar__label">lekarzy z prawem wykonywania zawodu</span>
+            </li>
+            <li class="trust-bar__item">
+              <strong class="trust-bar__num">15 min</strong>
+              <span class="trust-bar__label">średni czas do e-recepty</span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Tło hero: baner ze zdjęciem lekarza (desktop: pełna szerokość,
+           mobile: zaokrąglony baner pod tekstem). Zdjęcie dostarczone. -->
+      <div class="hero__media">
+        <img class="hero__photo" src="images/bg_2.png"
+             width="1152" height="424" loading="eager" fetchpriority="high"
+             alt="Uśmiechnięty lekarz w białym fartuchu ze stetoskopem" />
+        <div class="hero__badge" aria-hidden="true">
+          <span class="rating rating--sm">
+            <span class="stars stars--49"></span> 4,9/5
+          </span>
+          <span class="hero__badge-sub">z 8 400+ opinii</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================
+         JAK TO DZIAŁA — 4 kroki
+    =========================================================== -->
+    <section class="section" id="jak-to-dziala" aria-labelledby="steps-title">
+      <div class="container">
+        <header class="section-head" data-reveal>
+          <p class="section-head__eyebrow">Prosto i szybko</p>
+          <h2 class="section-head__title" id="steps-title">Jak to działa?</h2>
+          <p class="section-head__lead">
+            Cztery kroki dzielą Cię od konsultacji z lekarzem i e-recepty.
+          </p>
+        </header>
+
+        <ol class="steps">
+          <li class="step-card" data-reveal>
+            <span class="step-card__num">1</span>
+            <span class="step-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" />
+              </svg>
+            </span>
+            <h3 class="step-card__title">Wybierz specjalistę</h3>
+            <p class="step-card__text">
+              Przeglądaj lekarzy według specjalizacji, oceny i dostępności.
+              Wybierz termin, który Ci pasuje.
+            </p>
+          </li>
+
+          <li class="step-card" data-reveal>
+            <span class="step-card__num">2</span>
+            <span class="step-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              </svg>
+            </span>
+            <h3 class="step-card__title">Opisz objawy</h3>
+            <p class="step-card__text">
+              Wypełnij krótki wywiad medyczny i porozmawiaj z lekarzem
+              przez czat lub wideo — jak Ci wygodniej.
+            </p>
+          </li>
+
+          <li class="step-card" data-reveal>
+            <span class="step-card__num">3</span>
+            <span class="step-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="5" width="20" height="14" rx="2" /><path d="M2 10h20" />
+              </svg>
+            </span>
+            <h3 class="step-card__title">Zapłać online</h3>
+            <p class="step-card__text">
+              Bezpieczna płatność BLIK, kartą lub przelewem.
+              Bez ukrytych kosztów — cenę znasz z góry.
+            </p>
+          </li>
+
+          <li class="step-card" data-reveal>
+            <span class="step-card__num">4</span>
+            <span class="step-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <path d="M14 2v6h6" /><path d="m9 15 2 2 4-4" />
+              </svg>
+            </span>
+            <h3 class="step-card__title">Odbierz e-receptę / L4</h3>
+            <p class="step-card__text">
+              E-receptę, e-skierowanie lub e-zwolnienie otrzymasz na SMS
+              i e-mail. Kod zrealizujesz w każdej aptece.
+            </p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ==========================================================
+         SPECJALIZACJE — siatka kart
+    =========================================================== -->
+    <section class="section specialty-section" id="specjalizacje" aria-labelledby="spec-title">
+      <div class="container">
+        <header class="section-head" data-reveal>
+          <p class="section-head__eyebrow">Kompleksowa opieka</p>
+          <h2 class="section-head__title" id="spec-title">Specjalizacje</h2>
+          <p class="section-head__lead">
+            Ponad 20 dziedzin medycyny w jednym miejscu. Wybierz obszar,
+            który Cię interesuje.
+          </p>
+        </header>
+
+        <!-- Karty generowane z danych w JS (script/data.js -> script/specialties.js) -->
+        <ul class="specialty-grid" id="specialty-grid" aria-label="Lista specjalizacji">
+          <!-- fallback dla braku JS: krótka informacja -->
+          <li class="specialty-grid__empty">Wczytywanie specjalizacji…</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ==========================================================
+         LEKARZE — filtrowanie + karty
+    =========================================================== -->
+    <section class="section" id="lekarze" aria-labelledby="doctors-title">
+      <div class="container">
+        <header class="section-head" data-reveal>
+          <p class="section-head__eyebrow">Umów wizytę</p>
+          <h2 class="section-head__title" id="doctors-title">Dostępni lekarze</h2>
+          <p class="section-head__lead">
+            Filtruj po specjalizacji i wybierz najbliższy wolny termin.
+          </p>
+        </header>
+
+        <!-- Filtry specjalizacji (przyciski generowane w JS) -->
+        <div class="filters" data-reveal>
+          <div class="filters__chips" id="doctor-filters" role="group" aria-label="Filtruj lekarzy po specjalizacji">
+            <!-- chipy wstawiane przez JS -->
+          </div>
+          <p class="filters__count" id="doctor-count" aria-live="polite"></p>
+        </div>
+
+        <!-- Siatka kart lekarzy -->
+        <ul class="doctor-grid" id="doctor-grid" aria-label="Lista lekarzy"></ul>
+
+        <!-- Komunikat gdy brak wyników -->
+        <p class="doctor-empty" id="doctor-empty" hidden>
+          Brak lekarzy w tej specjalizacji. Wybierz inną kategorię.
+        </p>
+
+        <!-- Paginacja (3 lekarzy na stronę) — generowana w script/doctors.js -->
+        <nav class="pagination" id="doctor-pagination" aria-label="Paginacja listy lekarzy"></nav>
+      </div>
+    </section>
+
+    <!-- ==========================================================
+         OPINIE PACJENTÓW — siatka kart z ocenami
+    =========================================================== -->
+    <section class="section section--tint" id="opinie" aria-labelledby="reviews-title">
+      <div class="container">
+        <header class="section-head" data-reveal>
+          <p class="section-head__eyebrow">Zaufali nam</p>
+          <h2 class="section-head__title" id="reviews-title">Opinie pacjentów</h2>
+          <p class="section-head__lead">
+            Średnia ocena <strong>4,9/5</strong> na podstawie ponad 8 400 opinii.
+          </p>
+        </header>
+
+        <ul class="review-grid" id="review-grid" aria-label="Opinie pacjentów"></ul>
+      </div>
+    </section>
+
+    <!-- ==========================================================
+         CENNIK — 3 typy konsultacji
+    =========================================================== -->
+    <section class="section" id="cennik" aria-labelledby="pricing-title">
+      <div class="container">
+        <header class="section-head" data-reveal>
+          <p class="section-head__eyebrow">Przejrzyste ceny</p>
+          <h2 class="section-head__title" id="pricing-title">Cennik konsultacji</h2>
+          <p class="section-head__lead">
+            Płacisz tylko za wizytę. Bez abonamentów i ukrytych opłat.
+          </p>
+        </header>
+
+        <div class="pricing" role="list">
+          <!-- Plan 1 -->
+          <article class="price-card" role="listitem" data-reveal>
+            <h3 class="price-card__name">E-recepta</h3>
+            <p class="price-card__desc">Kontynuacja leczenia stałego</p>
+            <p class="price-card__price"><span class="price-card__amount">59 zł</span></p>
+            <ul class="price-card__list">
+              <li>Recepta na leki przyjmowane na stałe</li>
+              <li>Krótki wywiad w formularzu</li>
+              <li>Realizacja zwykle w 15 minut</li>
+              <li>Kod recepty na SMS i e-mail</li>
+            </ul>
+            <a class="btn btn--ghost btn--block" href="umow.html?service=recepta">Wybierz</a>
+          </article>
+
+          <!-- Plan 2 — wyróżniony -->
+          <article class="price-card price-card--featured" role="listitem" data-reveal>
+            <span class="price-card__badge">Najczęściej wybierane</span>
+            <h3 class="price-card__name">Konsultacja lekarska</h3>
+            <p class="price-card__desc">Pełna e-wizyta z lekarzem</p>
+            <p class="price-card__price"><span class="price-card__amount">99 zł</span></p>
+            <ul class="price-card__list">
+              <li>Rozmowa wideo lub czat z lekarzem</li>
+              <li>E-recepta, e-skierowanie lub e-zwolnienie</li>
+              <li>Zalecenia i plan leczenia na piśmie</li>
+              <li>Możliwość dopytania przez 48 h</li>
+            </ul>
+            <a class="btn btn--primary btn--block" href="umow.html?service=recepta">Umów wizytę</a>
+          </article>
+
+          <!-- Plan 3 -->
+          <article class="price-card" role="listitem" data-reveal>
+            <h3 class="price-card__name">Konsultacja specjalisty</h3>
+            <p class="price-card__desc">Dermatolog, psychiatra, endokrynolog…</p>
+            <p class="price-card__price"><span class="price-card__amount">149 zł</span></p>
+            <ul class="price-card__list">
+              <li>Wizyta u wybranego specjalisty</li>
+              <li>Analiza zdjęć i wyników badań</li>
+              <li>Indywidualny plan terapii</li>
+              <li>E-recepta i e-skierowanie</li>
+            </ul>
+            <a class="btn btn--ghost btn--block" href="umow.html?service=recepta">Wybierz</a>
+          </article>
+        </div>
+        <p class="pricing__note" data-reveal>
+          Jeśli lekarz nie wystawi recepty, zwracamy 100% kosztów konsultacji.
+        </p>
+      </div>
+    </section>
+
+    <!-- ==========================================================
+         FAQ — akordeon (czysty JS)
+    =========================================================== -->
+    <section class="section section--tint" id="faq" aria-labelledby="faq-title">
+      <div class="container container--narrow">
+        <header class="section-head" data-reveal>
+          <p class="section-head__eyebrow">Masz pytania?</p>
+          <h2 class="section-head__title" id="faq-title">Najczęstsze pytania</h2>
+        </header>
+
+        <div class="accordion" id="faq-accordion">
+          <!-- pozycje wstawiane przez JS z danych (script/data.js) -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================
+         CTA KOŃCOWE + formularz zapisu (walidacja front-end)
+    =========================================================== -->
+    <section class="section cta-final" id="kontakt" aria-labelledby="cta-title">
+      <div class="container">
+        <div class="cta-final__box" data-reveal>
+          <div class="cta-final__text">
+            <h2 class="cta-final__title" id="cta-title">
+              Zadbaj o zdrowie już dziś
+            </h2>
+            <p class="cta-final__lead">
+              Zostaw podstawowe dane, dokończ rejestrację w 30 sekund
+              i od razu umów pierwszą wizytę lub zamów e-receptę.
+            </p>
+            <ul class="cta-final__perks">
+              <li><span aria-hidden="true">✓</span> Pierwsza konsultacja z rabatem 20%</li>
+              <li><span aria-hidden="true">✓</span> Przypomnienia o receptach na stałe leki</li>
+              <li><span aria-hidden="true">✓</span> Dostęp do lekarzy 7 dni w tygodniu</li>
+            </ul>
+          </div>
+
+          <!-- Formularz — walidacja w script/form.js, noValidate wyłącza natywne dymki -->
+          <form class="signup-form" id="signup-form" novalidate>
+            <p class="signup-form__title">Załóż konto i umów wizytę</p>
+
+            <div class="field">
+              <label class="field__label" for="name">Imię i nazwisko</label>
+              <input class="field__input" type="text" id="name" name="name"
+                     autocomplete="name" placeholder="Jan Kowalski"
+                     aria-describedby="name-error" required />
+              <span class="field__error" id="name-error" aria-live="polite"></span>
+            </div>
+
+            <div class="field">
+              <label class="field__label" for="email">Adres e-mail</label>
+              <input class="field__input" type="email" id="email" name="email"
+                     autocomplete="email" placeholder="jan@example.com"
+                     aria-describedby="email-error" required />
+              <span class="field__error" id="email-error" aria-live="polite"></span>
+            </div>
+
+            <div class="field">
+              <label class="field__label" for="phone">Telefon</label>
+              <input class="field__input" type="tel" id="phone" name="phone"
+                     autocomplete="tel" placeholder="+48 600 000 000"
+                     aria-describedby="phone-error" required />
+              <span class="field__error" id="phone-error" aria-live="polite"></span>
+            </div>
+
+            <div class="field field--check">
+              <input class="field__checkbox" type="checkbox" id="consent"
+                     name="consent" aria-describedby="consent-error" required />
+              <label class="field__consent" for="consent">
+                Wyrażam zgodę na kontakt i akceptuję
+                <a href="#" class="link">Politykę prywatności</a>.
+              </label>
+              <span class="field__error" id="consent-error" aria-live="polite"></span>
+            </div>
+
+            <button class="btn btn--primary btn--block btn--lg" type="submit">
+              Załóż konto →
+            </button>
+
+            <!-- Komunikat (używany przy błędach walidacji; sukces = przejście do rejestracji) -->
+            <p class="signup-form__success" id="form-success" role="status" hidden>
+              ✓ Przechodzimy do rejestracji…
+            </p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============================================================
+       FOOTER
+  ============================================================= -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="site-footer__grid">
+        <!-- Kolumna marki -->
+        <div class="site-footer__brand">
+          <a class="brand brand--light" href="#top" aria-label="Zdrovia — strona główna">
+            <span class="brand__mark" aria-hidden="true">
+              <svg viewBox="0 0 32 32" width="28" height="28" role="img">
+                <path d="M16 3C10 9 6 12.5 6 18a10 10 0 0 0 20 0c0-5.5-4-9-10-15Z" fill="#12B5A0" />
+                <path d="M10.5 18h3l1.5-3.2 2.2 5 1.6-3.1h2.7" fill="none" stroke="#fff"
+                      stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+            <span class="brand__name">Zdrovia</span>
+          </a>
+          <p class="site-footer__desc">
+            Nowoczesna platforma telemedyczna. E-konsultacje, e-recepty
+            i e-zwolnienia online — dla całej Polski.
+          </p>
+          <div class="social" aria-label="Media społecznościowe">
+            <a class="social__link" href="#" aria-label="Facebook">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M14 9h3l.5-3H14V4.5c0-.8.3-1.5 1.5-1.5H17V.2C16.6.1 15.5 0 14.4 0 12 0 10.5 1.4 10.5 4v2H8v3h2.5v9H14z"/></svg>
+            </a>
+            <a class="social__link" href="#" aria-label="Instagram">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+            </a>
+            <a class="social__link" href="#" aria-label="LinkedIn">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M4.98 3.5A2.5 2.5 0 1 1 5 8.5a2.5 2.5 0 0 1 0-5zM3 9h4v12H3zM9 9h3.8v1.7h.1c.5-1 1.8-2 3.7-2 4 0 4.7 2.6 4.7 6V21h-4v-5.3c0-1.3 0-2.9-1.8-2.9s-2 1.4-2 2.8V21H9z"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Linki -->
+        <nav class="site-footer__col" aria-label="Serwis">
+          <h3 class="site-footer__heading">Serwis</h3>
+          <ul>
+            <li><a href="#specjalizacje">Specjalizacje</a></li>
+            <li><a href="#jak-to-dziala">Jak to działa</a></li>
+            <li><a href="#cennik">Cennik</a></li>
+            <li><a href="#lekarze">Umów wizytę</a></li>
+          </ul>
+        </nav>
+
+        <nav class="site-footer__col" aria-label="Pomoc">
+          <h3 class="site-footer__heading">Pomoc</h3>
+          <ul>
+            <li><a href="#faq">FAQ</a></li>
+            <li><a href="#kontakt">Kontakt</a></li>
+            <li><a href="#">Dla lekarzy</a></li>
+            <li><a href="#">Status usług</a></li>
+          </ul>
+        </nav>
+
+        <nav class="site-footer__col" aria-label="Informacje prawne">
+          <h3 class="site-footer__heading">Informacje</h3>
+          <ul>
+            <li><a href="#">Regulamin</a></li>
+            <li><a href="#">Polityka prywatności</a></li>
+            <li><a href="#">Polityka cookies</a></li>
+            <li><a href="#">RODO</a></li>
+          </ul>
+        </nav>
+      </div>
+
+      <!-- Disclaimer medyczny -->
+      <p class="site-footer__disclaimer">
+        <strong>Ważne:</strong> Zdrovia jest platformą pośredniczącą w udzielaniu
+        świadczeń telemedycznych przez współpracujących lekarzy. Serwis nie zastępuje
+        pomocy w stanach nagłego zagrożenia życia — w takiej sytuacji zadzwoń na
+        <strong>112</strong> lub <strong>999</strong>.
+      </p>
+
+      <div class="site-footer__bottom">
+        <p>© <span id="year">2026</span> Zdrovia sp. z o.o. • ul. Zdrowa 24, 00-001 Warszawa • NIP 000-00-00-000</p>
+        <p>Projekt koncepcyjny — dane lekarzy i opinie są przykładowe.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Przycisk „do góry" -->
+  <button class="to-top" id="to-top" aria-label="Wróć na górę strony" hidden>
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+         stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m18 15-6-6-6 6" />
+    </svg>
+  </button>
+
+  <!-- ============================================================
+       MODAL — profil lekarza + opinie (wypełniany przez script/modal.js)
+  ============================================================= -->
+  <div class="modal" id="doctor-modal" hidden>
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__dialog" role="dialog" aria-modal="true"
+         aria-labelledby="doctor-modal-name">
+      <button class="modal__close" type="button" data-close aria-label="Zamknij okno">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+             stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 6 6 18M6 6l12 12" />
+        </svg>
+      </button>
+      <div class="modal__body" id="doctor-modal-body"><!-- treść z JS --></div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SKRYPTY — moduły ładowane z defer, w kolejności zależności
+  ============================================================= -->
+  <script src="script/data.js" defer></script>
+  <script src="script/api.js" defer></script>
+  <script src="script/specialties.js" defer></script>
+  <script src="script/doctors.js" defer></script>
+  <script src="script/modal.js" defer></script>
+  <script src="script/reviews.js" defer></script>
+  <script src="script/faq.js" defer></script>
+  <script src="script/form.js" defer></script>
+  <script src="script/ui.js" defer></script>
+  <script src="script/main.js" defer></script>
+  <script src="script/auth-nav.js" defer></script>
+</body>
+</html>
