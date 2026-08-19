@@ -60,7 +60,7 @@ zdrowie24.pl/
 ├── dashboard-patient.html     # Panel pacjenta (wizyty, recepty, usługi)
 ├── dashboard-doctor.html      # Panel lekarza (wizyty, recepty, dostępność, profil)
 ├── umow.html                  # Kreator rezerwacji / płatnej usługi (e-recepta, L4, skierowanie)
-├── style/                     # base / layout / components / sections / app (CSS)
+├── style/                     # base / layout / components / sections / app / dashboard (CSS)
 ├── script/
 │   ├── data.js                # Dane mockowe (fallback landing page)
 │   ├── api.js                 # Klient REST API (fetch + JWT)
@@ -166,6 +166,136 @@ zalecane jest oparcie się wyłącznie o httpOnly cookie + ochronę CSRF.
   karty) — to projekt demonstracyjny. Kwota i status opłacenia zapisują się przy wizycie.
 - **Konta demo**: na stronie logowania dostępne jest **logowanie jednym kliknięciem** (pacjent
   lub lekarz), aby ułatwić przejrzenie projektu.
+
+---
+
+## Panel pacjenta ([dashboard-patient.html](dashboard-patient.html))
+
+W pełni funkcjonalny, responsywny panel z nawigacją SPA (przełączanie widoków po hashu URL).
+
+**Widoki:**
+- **Przegląd** — powitanie, statystyki (nadchodzące / zrealizowane / recepty / aktywne recepty),
+  karta najbliższej wizyty (z akcjami „Dołącz" i „Szczegóły") oraz skróty do kluczowych akcji.
+- **Moje wizyty** — zakładki **Nadchodzące / Zrealizowane / Anulowane**, karty wizyt ze statusem,
+  **anulowanie z modalem potwierdzenia** (PATCH do API, natychmiastowa aktualizacja bez przeładowania),
+  podgląd szczegółów, stany puste z CTA.
+- **Recepty** — lista e-recept ze statusem **aktywna/wygasła**, podgląd szczegółów w modalu.
+- **Profil** — edycja danych osobowych (PATCH `/patients/me`, e-mail tylko do odczytu) oraz
+  **zmiana hasła** (POST `/auth/change-password`, walidacja obecnego/nowego/powtórzonego hasła).
+
+**Mechanika i UX:**
+- **Ochrona dostępu**: przy wejściu sprawdzany jest token/sesja; brak sesji lub rola ≠ `patient`
+  → przekierowanie do `login.html`. Wygaśnięcie sesji (401) w trakcie → toast + powrót do logowania.
+- **Stany ładowania**: skeleton-loadery i spinnery przy każdym pobieraniu danych.
+- **Toasty**: własny, lekki komponent powiadomień (sukces/błąd/info) — bez bibliotek.
+- **Modale**: generyczny, dostępny modal (focus trap, Escape, klik w tło); na mobile **bottom-sheet**.
+- **Dostępność**: `aria-label` na przyciskach ikonowych, widoczny focus, kontrast AA, focus trap w modalach.
+
+**Responsywność** (testowana na 375 / 768 / 1440 px, brak poziomego scrolla):
+- **Mobile (<768px)**: górny pasek z hamburgerem + **wysuwany sidebar** i **dolna nawigacja** z
+  wyróżnionym przyciskiem „+"; karty w jednej kolumnie, przyciski dotykowe (min 44px).
+- **Tablet (768–1023px)**: węższy, stały sidebar; siatki kart 2-kolumnowe.
+- **Desktop (≥1024px)**: pełny sidebar; treść wyśrodkowana bez rozciągania.
+
+Style panelu: [style/dashboard.css](style/dashboard.css); wspólne komponenty (toast, modal)
+w [script/dash-common.js](script/dash-common.js) + [style/app.css](style/app.css).
+
+---
+
+## Panel lekarza ([dashboard-doctor.html](dashboard-doctor.html))
+
+Ten sam design system i komponenty co panel pacjenta (sidebar + widoki SPA, toasty, modale,
+skeletony, responsywność). Widoki:
+
+- **Przegląd** — powitanie, statystyki (wizyty w tym tygodniu, unikalni pacjenci, średnia ocena,
+  szacunkowy przychód z wizyt zrealizowanych), lista dzisiejszych wizyt („Rozpocznij"/„Szczegóły"),
+  skróty akcji.
+- **Kalendarz** — wszystkie wizyty pogrupowane po dacie, **filtr statusu** (zaplanowana/zrealizowana/
+  anulowana) i **okresu** (dziś/tydzień/nadchodzące/cały okres), **zmiana statusu** na „zrealizowana"
+  (PATCH, natychmiastowa aktualizacja), szczegóły w modalu, szybkie przejście do wystawienia recepty.
+- **Dostępność** — **siatka godzin** (8:00–20:00) per dzień tygodnia; sloty zajęte przez nadchodzące
+  wizyty są oznaczone i nieedytowalne, wolne — klikalne. Zapis przez `PATCH /doctors/:id/availability`
+  (sloty scalane w okna). Na mobile: lista dni z zawijającymi się chipami godzin (bez poziomego scrolla).
+- **Pacjenci** — lista pacjentów wyliczona z wizyt, **wyszukiwanie** po nazwisku, **historia**
+  pacjenta (wizyty + recepty) w modalu.
+- **Recepty** — formularz wystawienia (wizyta/pacjent → lek → dawkowanie → uwagi → ważność) z
+  walidacją i `POST /prescriptions` (recepta od razu widoczna u pacjenta), oraz **historia recept**
+  z filtrowaniem i statusem aktywna/wygasła.
+- **Statystyki** — **wykres słupkowy SVG** (wizyty w ostatnich 4 tygodniach, skalowalny `viewBox`)
+  i **rozkład wg statusu** (paski proporcji) — bez zewnętrznych bibliotek, liczone z API.
+- **Profil zawodowy** — edycja specjalizacji, lat doświadczenia, ceny, miasta i bio
+  (`PATCH /doctors/:id`) z **żywym podglądem** karty lekarza tak, jak widzą ją pacjenci.
+
+Ochrona dostępu (rola `doctor`), obsługa 401 (wygasła sesja), toasty i modale — jak w panelu pacjenta.
+Responsywność przetestowana na 375 / 768 / 1440 px (brak poziomego scrolla).
+Logika: [script/dashboard-doctor.js](script/dashboard-doctor.js); style współdzielone z panelem pacjenta
+([style/dashboard.css](style/dashboard.css)).
+
+---
+
+## AI Triage — „Wstępna kwalifikacja objawów" (czatbot + n8n)
+
+Czatbot dostępny dla pacjenta **przed umówieniem wizyty** (widget na landing page i w panelu
+pacjenta). Zbiera opis objawów, rozpoznaje stany pilne (red flags) i sugeruje specjalizację —
+**nie stawia diagnozy**.
+
+### Architektura (backend jako proxy — front NIGDY nie łączy się z n8n)
+
+```
+Widget czatu → POST /api/triage/chat (backend) → webhook n8n (AI Agent)
+             ← zapis rozmowy w bazie ← odpowiedź JSON ←
+```
+
+- **Nowa tabela** `triage_conversations`: `id, patient_id (NULL = przed rejestracją), session_id,
+  messages (JSON), suggested_specialty (SUGESTIA, nie diagnoza), is_urgent, created_at, updated_at`.
+- **`POST /api/triage/chat`** — body `{ sessionId, message, history? }`; waliduje wejście (długość
+  ≤ 1000), rate limit **20 wiadomości / sesję / godzinę**, wywołuje webhook n8n z nagłówkiem
+  `X-Webhook-Secret` i **timeoutem 15 s** (czytelny błąd, gdy n8n nie odpowiada), zapisuje rozmowę,
+  zwraca `{ reply, suggestedSpecialty, isUrgent, shouldEndConversation }`. Przy `isUrgent` wątek jest
+  zamykany (flaga wraca natychmiast).
+- **`GET /api/triage/:sessionId`** — historia rozmowy (wznowienie po odświeżeniu strony).
+- **Zmienne w `.env`**: `N8N_WEBHOOK_URL`, `N8N_WEBHOOK_SECRET`.
+
+### Konfiguracja n8n (workflow tworzony w UI n8n, nie w tym repo)
+
+Przykładowy szkielet w [n8n/triage-workflow-example.json](n8n/triage-workflow-example.json)
+(referencja struktury węzłów — bez podłączonych credentiali). Węzły:
+
+1. **Webhook** (trigger, `POST`, np. ścieżka `/triage`) — punkt wejścia.
+2. **IF / walidacja sekretu** — sprawdza nagłówek `X-Webhook-Secret`; brak/niepoprawny → odrzucenie
+   (np. Respond to Webhook 401).
+3. **AI Agent** (Chat Model OpenAI/Anthropic) z **systemowym promptem**: rola = zebranie informacji
+   o objawach, **NIGDY nie stawia diagnozy**; rozpoznaje **red flags** (ból w klatce piersiowej,
+   trudności w oddychaniu, silne krwawienie, utrata przytomności, myśli samobójcze, objawy udaru…)
+   → `isUrgent=true`; w przeciwnym razie po kilku pytaniach sugeruje **jedną** z dostępnych na
+   platformie specjalizacji (internista, pediatra, dermatolog, psychiatra, ginekolog, kardiolog,
+   laryngolog, endokrynolog).
+4. **Structured Output Parser / Function** — wymusza JSON:
+   `{ reply: string, suggestedSpecialty: string|null, isUrgent: boolean, shouldEndConversation: boolean }`.
+5. **Respond to Webhook** — zwraca powyższy JSON do backendu.
+
+### Podłączenie prawdziwego n8n
+
+1. Zbuduj workflow jak wyżej i skopiuj **Production URL** webhooka.
+2. W `.env` ustaw `N8N_WEBHOOK_URL` na ten adres oraz `N8N_WEBHOOK_SECRET` (ten sam sekret sprawdzaj
+   w węźle IF w n8n).
+3. Zrestartuj backend.
+
+### Tryb testowy (bez n8n)
+
+Repo zawiera **lokalną atrapę** n8n: `POST /api/_mock-n8n`
+([backend/src/mock/triage-mock.js](backend/src/mock/triage-mock.js)) — regułowo wykrywa red flags i
+sugeruje specjalizację. Domyślny `.env` wskazuje `N8N_WEBHOOK_URL` właśnie na tę atrapę, dzięki czemu
+cały przepływ (widget → backend → webhook → zapis) działa od razu po `npm run dev`.
+
+### Bezpieczeństwo i etyka
+
+- Wynik zapisujemy jako **`suggested_specialty`** (sugestia), **nigdy** jako diagnozę.
+- **Disclaimer** widoczny w widgecie przez całą rozmowę: „To nie jest diagnoza medyczna. W nagłych
+  przypadkach dzwoń 112 lub jedź na SOR."
+- `isUrgent` → wyraźny czerwony alert w czacie i zablokowanie dalszej rozmowy.
+- **TODO (RODO):** rozmowy sesji niezalogowanych (`patient_id IS NULL`) starsze niż 24 h powinny być
+  czyszczone/anonimizowane (np. zadanie cron) — zaznaczone w kodzie kontrolera.
 
 ---
 

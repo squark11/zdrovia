@@ -359,10 +359,21 @@
     const p = new URLSearchParams(location.search);
     const s = p.get("service");
     const d = p.get("doctor");
+    const spec = p.get("spec"); // sugestia z „Wstępnej kwalifikacji objawów"
     if (s && svc(s)) {
       state.service = s;
       const tile = document.querySelector(`.service-tile[data-service="${s}"]`);
       if (tile) tile.setAttribute("aria-pressed", "true");
+    }
+    // Preselekcja specjalizacji: ustaw konsultację i filtr lekarzy.
+    if (spec && el("wiz-spec").querySelector(`option[value="${spec}"]`)) {
+      if (!state.service) {
+        state.service = "konsultacja";
+        const tile = document.querySelector('.service-tile[data-service="konsultacja"]');
+        if (tile) tile.setAttribute("aria-pressed", "true");
+      }
+      el("wiz-spec").value = spec;
+      renderDoctorCards(spec);
     }
     if (d) {
       const doc = doctors.find((x) => String(x.id) === String(d));

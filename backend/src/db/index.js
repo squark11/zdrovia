@@ -100,11 +100,23 @@ db.exec(`
     end_time   TEXT NOT NULL               -- HH:MM
   );
 
+  CREATE TABLE IF NOT EXISTS triage_conversations (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    patient_id          INTEGER REFERENCES users(id) ON DELETE SET NULL, -- NULL = rozmowa przed rejestracją
+    session_id          TEXT NOT NULL UNIQUE,
+    messages            TEXT NOT NULL DEFAULT '[]',  -- JSON: [{role, content, timestamp}]
+    suggested_specialty TEXT,                        -- SUGESTIA, nie diagnoza (świadomie taka nazwa)
+    is_urgent           INTEGER NOT NULL DEFAULT 0,
+    created_at          TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at          TEXT
+  );
+
   CREATE INDEX IF NOT EXISTS idx_appt_patient ON appointments(patient_id);
   CREATE INDEX IF NOT EXISTS idx_appt_doctor  ON appointments(doctor_id);
   CREATE INDEX IF NOT EXISTS idx_presc_patient ON prescriptions(patient_id);
   CREATE INDEX IF NOT EXISTS idx_presc_doctor  ON prescriptions(doctor_id);
   CREATE INDEX IF NOT EXISTS idx_avail_doctor  ON availability(doctor_id);
+  CREATE INDEX IF NOT EXISTS idx_triage_session ON triage_conversations(session_id);
 `);
 
 /* -------------------------------------------------------------

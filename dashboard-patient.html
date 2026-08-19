@@ -15,15 +15,18 @@
   <link rel="stylesheet" href="style/layout.css" />
   <link rel="stylesheet" href="style/components.css" />
   <link rel="stylesheet" href="style/app.css" />
+  <link rel="stylesheet" href="style/dashboard.css" />
+  <link rel="stylesheet" href="style/triage.css" />
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
 </head>
 
-<body class="app-body">
+<body class="app-body dash-body">
   <a class="skip-link" href="#main">Przejdź do treści</a>
 
-  <header class="app-header">
-    <div class="container app-header__inner">
-      <a class="brand" href="index.html" aria-label="Zdrovia — strona główna">
+  <div class="dash-shell">
+    <!-- ======================= SIDEBAR ======================= -->
+    <aside class="side-nav" id="side-nav" aria-label="Nawigacja panelu">
+      <a class="brand side-nav__brand" href="index.html" aria-label="Zdrovia — strona główna">
         <span class="brand__mark" aria-hidden="true">
           <svg viewBox="0 0 32 32" width="30" height="30" role="img">
             <path d="M16 3C10 9 6 12.5 6 18a10 10 0 0 0 20 0c0-5.5-4-9-10-15Z" fill="#0E9F8E" />
@@ -33,77 +36,247 @@
         </span>
         <span class="brand__name">Zdrovia</span>
       </a>
-      <div class="app-header__actions">
-        <span class="app-header__user" id="header-user"></span>
-        <a class="main-nav__login" href="index.html">Strona główna</a>
-        <button class="btn btn--ghost" type="button" id="logout-btn">Wyloguj</button>
+
+      <nav class="side-nav__menu" aria-label="Sekcje panelu">
+        <a class="side-nav__link" href="#przeglad" data-view="przeglad">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 4l9 6.5"/><path d="M5 9.5V20h14V9.5"/><path d="M9.5 20v-5h5v5"/></svg>
+          <span class="side-nav__label">Przegląd</span>
+        </a>
+        <a class="side-nav__link" href="#wizyty" data-view="wizyty">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>
+          <span class="side-nav__label">Moje wizyty</span>
+        </a>
+        <a class="side-nav__link" href="#recepty" data-view="recepty">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg>
+          <span class="side-nav__label">Recepty</span>
+        </a>
+        <a class="side-nav__link" href="#profil" data-view="profil">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M5 21a7 7 0 0 1 14 0"/></svg>
+          <span class="side-nav__label">Profil</span>
+        </a>
+      </nav>
+
+      <a class="btn btn--primary side-nav__cta" href="umow.html">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        <span class="side-nav__label">Umów wizytę</span>
+      </a>
+
+      <div class="side-nav__foot">
+        <div class="side-nav__user">
+          <span class="side-nav__avatar" id="side-avatar" aria-hidden="true"></span>
+          <span class="side-nav__label" id="side-user-name">…</span>
+        </div>
+        <button class="side-nav__logout" type="button" data-logout>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>
+          <span class="side-nav__label">Wyloguj</span>
+        </button>
       </div>
-    </div>
-  </header>
+    </aside>
 
-  <main class="dash" id="main">
-    <div class="container">
-      <div class="dash-hero">
-        <h1 class="dash-hero__title" id="welcome">Panel pacjenta</h1>
-        <p class="dash-hero__subtitle">Zarządzaj wizytami i e-receptami w jednym miejscu.</p>
-      </div>
+    <!-- ======================= MAIN ======================= -->
+    <div class="dash-main">
+      <!-- Topbar (mobile) -->
+      <header class="dash-topbar">
+        <button class="nav-toggle dash-topbar__toggle" id="side-toggle"
+                aria-label="Otwórz menu" aria-expanded="false" aria-controls="side-nav">
+          <span class="nav-toggle__bar"></span>
+          <span class="nav-toggle__bar"></span>
+          <span class="nav-toggle__bar"></span>
+        </button>
+        <a class="brand" href="index.html" aria-label="Zdrovia">
+          <span class="brand__mark" aria-hidden="true">
+            <svg viewBox="0 0 32 32" width="26" height="26" role="img">
+              <path d="M16 3C10 9 6 12.5 6 18a10 10 0 0 0 20 0c0-5.5-4-9-10-15Z" fill="#0E9F8E" />
+              <path d="M10.5 18h3l1.5-3.2 2.2 5 1.6-3.1h2.7" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </span>
+          <span class="brand__name">Zdrovia</span>
+        </a>
+        <span class="dash-topbar__user" id="header-user"></span>
+      </header>
 
-      <!-- Kafelki statystyk -->
-      <ul class="stat-tiles" id="stat-tiles" aria-label="Podsumowanie">
-        <li class="stat-tile"><div class="stat-tile__value" id="stat-upcoming">–</div><div class="stat-tile__label">Nadchodzące wizyty</div></li>
-        <li class="stat-tile"><div class="stat-tile__value" id="stat-done">–</div><div class="stat-tile__label">Zrealizowane</div></li>
-        <li class="stat-tile"><div class="stat-tile__value" id="stat-rx">–</div><div class="stat-tile__label">E-recepty</div></li>
-        <li class="stat-tile"><div class="stat-tile__value" id="stat-next">–</div><div class="stat-tile__label">Najbliższa wizyta</div></li>
-      </ul>
+      <main class="dash-content" id="main">
+        <!-- Globalny błąd (np. brak połączenia z API) -->
+        <div class="alert alert--error" id="global-alert" role="alert" hidden></div>
 
-      <div class="panel-grid">
-        <!-- LEWA: wizyty + recepty -->
-        <div>
-          <section class="panel" aria-labelledby="appts-title">
-            <div class="panel__head">
-              <h2 class="panel__title" id="appts-title">Twoje wizyty</h2>
+        <!-- ============ WIDOK: PRZEGLĄD ============ -->
+        <section class="view is-active" id="view-przeglad" data-view="przeglad" aria-labelledby="v1-title">
+          <div class="view__head">
+            <div>
+              <h1 class="view__title" id="v1-title">Panel pacjenta</h1>
+              <p class="view__sub" id="welcome-sub">Witaj ponownie 👋</p>
             </div>
-            <div class="panel__body">
-              <div class="data-list" id="appointments-list">
+          </div>
+
+          <ul class="stat-tiles" aria-label="Podsumowanie">
+            <li class="stat-tile"><div class="stat-tile__value" id="stat-upcoming">–</div><div class="stat-tile__label">Nadchodzące wizyty</div></li>
+            <li class="stat-tile"><div class="stat-tile__value" id="stat-done">–</div><div class="stat-tile__label">Zrealizowane</div></li>
+            <li class="stat-tile"><div class="stat-tile__value" id="stat-rx">–</div><div class="stat-tile__label">E-recepty</div></li>
+            <li class="stat-tile"><div class="stat-tile__value" id="stat-active-rx">–</div><div class="stat-tile__label">Aktywne recepty</div></li>
+          </ul>
+
+          <div class="overview-grid">
+            <section class="panel" aria-labelledby="next-title">
+              <div class="panel__head"><h2 class="panel__title" id="next-title">Najbliższa wizyta</h2></div>
+              <div class="panel__body" id="next-visit">
                 <div class="loading-row"><span class="spinner"></span> Wczytywanie…</div>
               </div>
-            </div>
-          </section>
+            </section>
 
-          <section class="panel" aria-labelledby="rx-title">
-            <div class="panel__head">
-              <h2 class="panel__title" id="rx-title">Twoje e-recepty</h2>
-            </div>
-            <div class="panel__body">
-              <div class="data-list" id="prescriptions-list">
-                <div class="loading-row"><span class="spinner"></span> Wczytywanie…</div>
+            <section class="panel" aria-labelledby="quick-title">
+              <div class="panel__head"><h2 class="panel__title" id="quick-title">Szybkie akcje</h2></div>
+              <div class="panel__body quick-actions">
+                <a class="quick-action" href="umow.html">
+                  <span class="quick-action__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                  </span>
+                  <span class="quick-action__text"><strong>Umów wizytę</strong><small>Konsultacja, e-recepta, L4…</small></span>
+                </a>
+                <a class="quick-action" href="#recepty" data-view="recepty">
+                  <span class="quick-action__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>
+                  </span>
+                  <span class="quick-action__text"><strong>Moje recepty</strong><small>Podgląd i status</small></span>
+                </a>
+                <a class="quick-action" href="#wizyty" data-view="wizyty">
+                  <span class="quick-action__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>
+                  </span>
+                  <span class="quick-action__text"><strong>Moje wizyty</strong><small>Historia i nadchodzące</small></span>
+                </a>
               </div>
-            </div>
-          </section>
-        </div>
+            </section>
+          </div>
+        </section>
 
-        <!-- PRAWA: rezerwacja -->
-        <div>
-          <section class="panel" aria-labelledby="book-title">
-            <div class="panel__head">
-              <h2 class="panel__title" id="book-title">Umów wizytę / zamów usługę</h2>
-            </div>
-            <div class="panel__body">
-              <p class="data-item__sub" style="margin-bottom:var(--space-4)">
-                Wybierz usługę — przeprowadzimy Cię przez rezerwację, kwestionariusz i płatność.
-              </p>
-              <div class="service-tiles" id="dash-services"></div>
-            </div>
-          </section>
-        </div>
-      </div>
+        <!-- ============ WIDOK: MOJE WIZYTY ============ -->
+        <section class="view" id="view-wizyty" data-view="wizyty" aria-labelledby="v2-title" hidden>
+          <div class="view__head">
+            <h1 class="view__title" id="v2-title">Moje wizyty</h1>
+            <a class="btn btn--primary" href="umow.html">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+              Umów wizytę
+            </a>
+          </div>
+
+          <div class="tabs" role="tablist" aria-label="Filtr wizyt">
+            <button class="tab is-active" type="button" role="tab" aria-selected="true" data-tab="upcoming">Nadchodzące</button>
+            <button class="tab" type="button" role="tab" aria-selected="false" data-tab="done">Zrealizowane</button>
+            <button class="tab" type="button" role="tab" aria-selected="false" data-tab="cancelled">Anulowane</button>
+          </div>
+
+          <div class="appt-grid" id="appt-grid"></div>
+        </section>
+
+        <!-- ============ WIDOK: RECEPTY ============ -->
+        <section class="view" id="view-recepty" data-view="recepty" aria-labelledby="v3-title" hidden>
+          <div class="view__head"><h1 class="view__title" id="v3-title">Moje e-recepty</h1></div>
+          <div class="rx-grid" id="rx-grid"></div>
+        </section>
+
+        <!-- ============ WIDOK: PROFIL ============ -->
+        <section class="view" id="view-profil" data-view="profil" aria-labelledby="v4-title" hidden>
+          <div class="view__head"><h1 class="view__title" id="v4-title">Profil</h1></div>
+
+          <div class="profile-grid">
+            <section class="panel" aria-labelledby="pd-title">
+              <div class="panel__head"><h2 class="panel__title" id="pd-title">Dane osobowe</h2></div>
+              <div class="panel__body">
+                <form id="profile-form" novalidate>
+                  <div class="form-row">
+                    <div class="field">
+                      <label class="field__label" for="pf-first">Imię</label>
+                      <input class="field__input" id="pf-first" autocomplete="given-name" aria-describedby="pf-first-error" />
+                      <span class="field__error" id="pf-first-error" aria-live="polite"></span>
+                    </div>
+                    <div class="field">
+                      <label class="field__label" for="pf-last">Nazwisko</label>
+                      <input class="field__input" id="pf-last" autocomplete="family-name" aria-describedby="pf-last-error" />
+                      <span class="field__error" id="pf-last-error" aria-live="polite"></span>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="field">
+                      <label class="field__label" for="pf-phone">Telefon</label>
+                      <input class="field__input" id="pf-phone" type="tel" autocomplete="tel" aria-describedby="pf-phone-error" />
+                      <span class="field__error" id="pf-phone-error" aria-live="polite"></span>
+                    </div>
+                    <div class="field">
+                      <label class="field__label" for="pf-birth">Data urodzenia</label>
+                      <input class="field__input" id="pf-birth" type="date" />
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="pf-email">Adres e-mail</label>
+                    <input class="field__input" id="pf-email" type="email" readonly aria-describedby="pf-email-hint" />
+                    <span class="field__hint" id="pf-email-hint">Adres e-mail jest identyfikatorem konta i nie może być zmieniony.</span>
+                  </div>
+                  <button class="btn btn--primary" type="submit" id="profile-save">Zapisz zmiany</button>
+                </form>
+              </div>
+            </section>
+
+            <section class="panel" aria-labelledby="pw-title">
+              <div class="panel__head"><h2 class="panel__title" id="pw-title">Zmiana hasła</h2></div>
+              <div class="panel__body">
+                <form id="password-form" novalidate>
+                  <div class="field">
+                    <label class="field__label" for="pw-old">Obecne hasło</label>
+                    <input class="field__input" id="pw-old" type="password" autocomplete="current-password" aria-describedby="pw-old-error" />
+                    <span class="field__error" id="pw-old-error" aria-live="polite"></span>
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="pw-new">Nowe hasło (min. 8 znaków)</label>
+                    <input class="field__input" id="pw-new" type="password" autocomplete="new-password" aria-describedby="pw-new-error" />
+                    <span class="field__error" id="pw-new-error" aria-live="polite"></span>
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="pw-rep">Powtórz nowe hasło</label>
+                    <input class="field__input" id="pw-rep" type="password" autocomplete="new-password" aria-describedby="pw-rep-error" />
+                    <span class="field__error" id="pw-rep-error" aria-live="polite"></span>
+                  </div>
+                  <button class="btn btn--ghost" type="submit" id="password-save">Zmień hasło</button>
+                </form>
+              </div>
+            </section>
+          </div>
+        </section>
+      </main>
     </div>
-  </main>
+
+    <!-- Przyciemnienie tła dla wysuwanego menu (mobile) -->
+    <div class="side-nav__scrim" id="side-scrim" hidden></div>
+  </div>
+
+  <!-- ======================= DOLNA NAWIGACJA (mobile) ======================= -->
+  <nav class="bottom-nav" aria-label="Nawigacja panelu (mobile)">
+    <a class="bottom-nav__link" href="#przeglad" data-view="przeglad">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 4l9 6.5"/><path d="M5 9.5V20h14V9.5"/></svg>
+      <span>Przegląd</span>
+    </a>
+    <a class="bottom-nav__link" href="#wizyty" data-view="wizyty">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>
+      <span>Wizyty</span>
+    </a>
+    <a class="bottom-nav__link bottom-nav__link--cta" href="umow.html" aria-label="Umów wizytę">
+      <span class="bottom-nav__cta" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      </span>
+    </a>
+    <a class="bottom-nav__link" href="#recepty" data-view="recepty">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>
+      <span>Recepty</span>
+    </a>
+    <a class="bottom-nav__link" href="#profil" data-view="profil">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M5 21a7 7 0 0 1 14 0"/></svg>
+      <span>Profil</span>
+    </a>
+  </nav>
 
   <script src="script/api.js" defer></script>
   <script src="script/dash-common.js" defer></script>
-  <script src="script/services.js" defer></script>
   <script src="script/dashboard-patient.js" defer></script>
+  <script src="script/triage.js" defer></script>
   <script src="script/adblock-notice.js" defer></script>
 </body>
 </html>

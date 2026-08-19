@@ -422,3 +422,98 @@ select.field__input { cursor: pointer; }
 .demo-box__title { font-weight: 700; font-size: 0.85rem; color: var(--c-ink-soft); margin-bottom: var(--space-3); }
 .demo-box__btns { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: var(--space-3); }
 .demo-box__note { font-size: 0.78rem; color: var(--c-ink-muted); line-height: 1.5; }
+
+/* =============================================================
+   TOASTY (dash-common.js: Zdrovia.dash.toast)
+============================================================= */
+.toast-root {
+  position: fixed;
+  right: 1rem; bottom: 1rem;
+  z-index: 400;
+  display: flex; flex-direction: column; gap: 0.5rem;
+  width: min(360px, calc(100vw - 2rem));
+  pointer-events: none;
+}
+.toast {
+  pointer-events: auto;
+  display: flex; align-items: center; gap: 0.6rem;
+  padding: 0.85rem 1rem;
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+  border-left-width: 4px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  opacity: 0; transform: translateY(12px);
+  transition: opacity 0.25s, transform 0.25s;
+}
+.toast.is-in { opacity: 1; transform: none; }
+.toast--success { border-left-color: var(--c-primary); }
+.toast--error { border-left-color: var(--c-accent-dark); }
+.toast--info { border-left-color: #3E8FA8; }
+.toast__icon { font-size: 1rem; flex-shrink: 0; }
+.toast__msg { flex: 1; font-size: 0.9rem; color: var(--c-ink); font-weight: 500; }
+.toast__close { width: 26px; height: 26px; display: grid; place-items: center; border-radius: 50%; color: var(--c-ink-muted); font-size: 1.1rem; flex-shrink: 0; }
+.toast__close:hover { background: var(--c-bg); }
+@media (max-width: 480px) {
+  .toast-root { left: 1rem; right: 1rem; bottom: calc(64px + 1rem); width: auto; }
+}
+
+/* =============================================================
+   GENERYCZNY MODAL (dash-common.js: Zdrovia.dash.openModal)
+   Na mobile: bottom-sheet.
+============================================================= */
+.dmodal { position: fixed; inset: 0; z-index: 300; display: grid; place-items: center; padding: var(--space-4); }
+.dmodal__backdrop {
+  position: absolute; inset: 0;
+  background: rgba(10, 30, 28, 0.55);
+  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+  opacity: 0; transition: opacity 0.25s;
+}
+.dmodal.is-open .dmodal__backdrop { opacity: 1; }
+.dmodal__dialog {
+  position: relative; z-index: 1;
+  width: 100%; max-width: 520px; max-height: 90dvh; overflow-y: auto;
+  background: var(--c-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: clamp(1.25rem, 3vw, 1.75rem);
+  opacity: 0; transform: translateY(16px) scale(0.98);
+  transition: opacity 0.25s, transform 0.28s var(--ease);
+}
+.dmodal.is-open .dmodal__dialog { opacity: 1; transform: none; }
+.dmodal__close {
+  position: absolute; top: 12px; right: 12px;
+  width: 40px; height: 40px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: var(--c-bg); color: var(--c-ink-soft);
+  transition: background var(--transition), color var(--transition);
+}
+.dmodal__close:hover { background: var(--c-line); color: var(--c-ink); }
+@media (max-width: 480px) {
+  .dmodal { align-items: flex-end; padding: 0; }
+  .dmodal__dialog {
+    max-width: none; max-height: 88dvh;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    transform: translateY(100%);
+  }
+  .dmodal.is-open .dmodal__dialog { transform: none; }
+}
+
+/* Potwierdzenie */
+.confirm__title { font-size: 1.15rem; margin-bottom: 0.4rem; padding-right: 2rem; }
+.confirm__msg { color: var(--c-ink-soft); margin-bottom: var(--space-5); }
+.confirm__actions { display: flex; gap: 0.6rem; justify-content: flex-end; }
+@media (max-width: 480px) {
+  .confirm__actions { flex-direction: column-reverse; }
+  .confirm__actions .btn { width: 100%; }
+}
+
+/* Szczegóły (modal wizyty / recepty) */
+.detail__title { font-size: 1.2rem; margin-bottom: var(--space-4); padding-right: 2rem; }
+.detail__list { display: grid; }
+.detail__row { display: flex; justify-content: space-between; gap: var(--space-4); padding: 0.6rem 0; border-bottom: 1px solid var(--c-line-soft); font-size: 0.92rem; }
+.detail__row:last-child { border-bottom: 0; }
+.detail__row span { color: var(--c-ink-muted); flex-shrink: 0; }
+.detail__row strong { color: var(--c-ink); text-align: right; }
+.detail__note { margin-top: var(--space-4); padding: var(--space-3); background: var(--c-bg); border-radius: var(--radius); font-size: 0.9rem; color: var(--c-ink-soft); }

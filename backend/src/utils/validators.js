@@ -49,6 +49,11 @@ const loginSchema = z.object({
   password: z.string().min(1, "Podaj hasło"),
 });
 
+const changePasswordSchema = z.object({
+  oldPassword: z.string().min(1, "Podaj obecne hasło"),
+  newPassword: password,
+});
+
 const patientUpdateSchema = z.object({
   firstName: z.string().trim().min(2).optional(),
   lastName: z.string().trim().min(2).optional(),
@@ -98,9 +103,20 @@ const prescriptionCreateSchema = z.object({
   validUntil: date.optional(),
 });
 
+const triageChatSchema = z.object({
+  sessionId: z.string().trim().min(8, "Nieprawidłowy identyfikator sesji").max(100),
+  message: z.string().trim().min(1, "Wpisz wiadomość").max(1000, "Wiadomość jest za długa (maks. 1000 znaków)"),
+  history: z
+    .array(z.object({ role: z.enum(["user", "assistant"]), content: z.string().max(2000) }))
+    .max(50)
+    .optional(),
+});
+
 module.exports = {
   registerSchema,
   loginSchema,
+  changePasswordSchema,
+  triageChatSchema,
   patientUpdateSchema,
   doctorUpdateSchema,
   availabilitySchema,

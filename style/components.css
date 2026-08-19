@@ -544,3 +544,14 @@
 .adblock-notice__close:hover { background: rgba(122, 90, 30, 0.12); }
 
 @media (prefers-reduced-motion: reduce) { .adblock-notice { animation: none; } }
+
+/* Przycisk niebezpieczny (np. anulowanie / usuwanie) */
+.btn--danger {
+  background: linear-gradient(135deg, #F0674F 0%, #D6472F 100%);
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(214, 71, 47, 0.26);
+}
+.btn--danger:hover {
+  box-shadow: 0 12px 26px rgba(214, 71, 47, 0.34);
+  transform: translateY(-2px);
+}

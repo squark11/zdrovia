@@ -87,6 +87,19 @@ function logout(_req, res) {
   res.json({ ok: true });
 }
 
+/* POST /api/auth/change-password  (zalogowany) */
+function changePassword(req, res) {
+  const { oldPassword, newPassword } = req.body;
+  const row = db.prepare("SELECT * FROM users WHERE id = ?").get(req.user.id);
+  if (!row) throw new ApiError(404, "Użytkownik nie istnieje");
+  if (!bcrypt.compareSync(oldPassword, row.password_hash)) {
+    throw new ApiError(400, "Obecne hasło jest nieprawidłowe", { oldPassword: "Nieprawidłowe hasło" });
+  }
+  const hash = bcrypt.hashSync(newPassword, 10);
+  db.prepare("UPDATE users SET password_hash = ? WHERE id = ?").run(hash, req.user.id);
+  res.json({ ok: true });
+}
+
 /* GET /api/auth/me */
 function me(req, res) {
   const user = getUserById(req.user.id);
@@ -95,4 +108,4 @@ function me(req, res) {
   res.json({ user: meUser(user, profile) });
 }
 
-module.exports = { register, login, logout, me };
+module.exports = { register, login, logout, me, changePassword };

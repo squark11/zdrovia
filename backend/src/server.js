@@ -49,6 +49,10 @@ app.use("/api/doctors", require("./routes/doctors.routes"));
 app.use("/api/patients", require("./routes/patients.routes"));
 app.use("/api/appointments", require("./routes/appointments.routes"));
 app.use("/api/prescriptions", require("./routes/prescriptions.routes"));
+app.use("/api/triage", require("./routes/triage.routes"));
+
+// Lokalna atrapa n8n (tylko do testów; w produkcji N8N_WEBHOOK_URL wskazuje realny n8n).
+app.post("/api/_mock-n8n", require("./mock/triage-mock").mockTriage);
 
 // 404 dla nieznanych tras /api (zanim wejdzie statyka).
 app.use("/api", notFound);

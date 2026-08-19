@@ -1,0 +1,178 @@
+/* =============================================================
+   triage.css — widget „Wstępna kwalifikacja objawów"
+   Desktop: okno w prawym dolnym rogu. Mobile: pełnoekranowy panel.
+============================================================= */
+
+/* Pływający przycisk */
+.triage-fab {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 180;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 56px;
+  padding: 0 1.15rem 0 1rem;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(135deg, var(--c-primary), var(--c-primary-dark));
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 10px 26px rgba(14, 159, 142, 0.4);
+  transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+}
+.triage-fab:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(14, 159, 142, 0.5); }
+.triage-fab.is-hidden { opacity: 0; pointer-events: none; transform: scale(0.85); }
+.triage-fab__label { white-space: nowrap; }
+
+/* Podnieś przycisk „do góry" (landing) nad przyciskiem czatu */
+.to-top { bottom: calc(1.25rem + 66px); }
+
+@media (max-width: 767px) {
+  .triage-fab { bottom: calc(64px + 1rem); } /* nad dolną nawigacją (dashboard) */
+}
+@media (max-width: 600px) {
+  .triage-fab { width: 56px; padding: 0; justify-content: center; }
+  .triage-fab__label { display: none; }
+}
+
+/* Panel czatu */
+.triage-panel {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 190;
+  width: min(390px, calc(100vw - 2rem));
+  height: min(600px, calc(100dvh - 2.5rem));
+  display: flex;
+  flex-direction: column;
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  transform-origin: bottom right;
+}
+/* Panel widoczny od razu po otwarciu (bez ryzyka „utknięcia" animacji). */
+.triage-panel[hidden] { display: none; }
+
+@media (max-width: 600px) {
+  .triage-panel {
+    right: 0; bottom: 0; left: 0;
+    width: 100%; height: 100dvh; max-height: 100dvh;
+    border-radius: 0;
+  }
+}
+
+/* Nagłówek */
+.triage-panel__head {
+  display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
+  padding: 0.85rem 1rem;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-primary-dark));
+  color: #fff;
+}
+.triage-panel__title { display: flex; align-items: center; gap: 0.6rem; }
+.triage-panel__title strong { font-size: 0.98rem; }
+.triage-panel__title small { display: block; opacity: 0.85; font-size: 0.72rem; font-weight: 500; }
+.triage-panel__dot { width: 9px; height: 9px; border-radius: 50%; background: #8BEBD9; box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.25); flex-shrink: 0; }
+.triage-panel__close { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; color: #fff; flex-shrink: 0; }
+.triage-panel__close:hover { background: rgba(255, 255, 255, 0.16); }
+
+/* Disclaimer (zawsze widoczny) */
+.triage-disclaimer {
+  margin: 0;
+  padding: 0.6rem 1rem;
+  background: #FFF8EC;
+  border-bottom: 1px solid #F3E2BF;
+  color: #7A5A1E;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+.triage-disclaimer strong { color: #5C4310; }
+
+/* Wiadomości */
+.triage-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  background: var(--c-bg);
+}
+.triage-msg { display: flex; }
+.triage-msg--user { justify-content: flex-end; }
+.triage-bubble {
+  max-width: 82%;
+  padding: 0.6rem 0.85rem;
+  border-radius: 14px;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  word-wrap: break-word;
+}
+.triage-msg--assistant .triage-bubble {
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+  color: var(--c-ink);
+  border-bottom-left-radius: 4px;
+}
+.triage-msg--user .triage-bubble {
+  background: var(--c-primary);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+
+/* „pisze…" */
+.triage-typing { display: inline-flex; gap: 4px; align-items: center; }
+.triage-typing span { width: 7px; height: 7px; border-radius: 50%; background: var(--c-ink-muted); animation: triage-blink 1.2s infinite; }
+.triage-typing span:nth-child(2) { animation-delay: 0.2s; }
+.triage-typing span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes triage-blink { 0%, 60%, 100% { opacity: 0.3; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-3px); } }
+
+/* Alert pilny */
+.triage-urgent {
+  background: #FDECEC;
+  border: 1px solid #F5C6C0;
+  color: #B23A2E;
+  border-radius: var(--radius);
+  padding: 0.75rem 0.85rem;
+}
+.triage-urgent p { margin: 0.3rem 0 0; font-size: 0.85rem; line-height: 1.45; }
+.triage-urgent a { color: #B23A2E; font-weight: 800; text-decoration: underline; }
+
+/* Sugerowana specjalizacja */
+.triage-suggest { padding: 0.75rem 1rem; border-top: 1px solid var(--c-line); background: var(--c-primary-tint); }
+.triage-suggest[hidden] { display: none; }
+.triage-suggest__label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--c-primary-dark); font-weight: 700; }
+.triage-suggest__row { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin: 0.35rem 0 0.2rem; }
+.triage-suggest__row strong { color: var(--c-ink); font-size: 1.05rem; }
+.triage-suggest__note { font-size: 0.75rem; color: var(--c-ink-muted); }
+
+/* Pole wprowadzania */
+.triage-input {
+  display: flex; gap: 0.5rem; align-items: flex-end;
+  padding: 0.75rem;
+  border-top: 1px solid var(--c-line);
+  background: var(--c-surface);
+}
+.triage-input textarea {
+  flex: 1;
+  resize: none;
+  max-height: 120px;
+  min-height: 44px;
+  padding: 0.6rem 0.8rem;
+  border: 1.5px solid var(--c-line);
+  border-radius: var(--radius);
+  font: inherit;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.triage-input textarea:focus { outline: none; border-color: var(--c-primary); box-shadow: 0 0 0 3px rgba(14, 159, 142, 0.12); }
+.triage-send { flex-shrink: 0; width: 44px; height: 44px; display: grid; place-items: center; border-radius: var(--radius); background: var(--c-primary); color: #fff; transition: background var(--transition); }
+.triage-send:hover:not(:disabled) { background: var(--c-primary-dark); }
+.triage-send:disabled { opacity: 0.5; cursor: not-allowed; }
+
+@media (prefers-reduced-motion: reduce) {
+  .triage-panel, .triage-fab { transition: none; }
+  .triage-typing span { animation: none; }
+}

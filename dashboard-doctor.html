@@ -15,15 +15,17 @@
   <link rel="stylesheet" href="style/layout.css" />
   <link rel="stylesheet" href="style/components.css" />
   <link rel="stylesheet" href="style/app.css" />
+  <link rel="stylesheet" href="style/dashboard.css" />
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
 </head>
 
-<body class="app-body">
+<body class="app-body dash-body">
   <a class="skip-link" href="#main">Przejdź do treści</a>
 
-  <header class="app-header">
-    <div class="container app-header__inner">
-      <a class="brand" href="index.html" aria-label="Zdrovia — strona główna">
+  <div class="dash-shell">
+    <!-- ======================= SIDEBAR ======================= -->
+    <aside class="side-nav" id="side-nav" aria-label="Nawigacja panelu">
+      <a class="brand side-nav__brand" href="index.html" aria-label="Zdrovia — strona główna">
         <span class="brand__mark" aria-hidden="true">
           <svg viewBox="0 0 32 32" width="30" height="30" role="img">
             <path d="M16 3C10 9 6 12.5 6 18a10 10 0 0 0 20 0c0-5.5-4-9-10-15Z" fill="#0E9F8E" />
@@ -33,116 +35,317 @@
         </span>
         <span class="brand__name">Zdrovia</span>
       </a>
-      <div class="app-header__actions">
-        <span class="app-header__user" id="header-user"></span>
-        <a class="main-nav__login" href="index.html">Strona główna</a>
-        <button class="btn btn--ghost" type="button" id="logout-btn">Wyloguj</button>
+
+      <nav class="side-nav__menu" aria-label="Sekcje panelu">
+        <a class="side-nav__link" href="#przeglad" data-view="przeglad">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 4l9 6.5"/><path d="M5 9.5V20h14V9.5"/><path d="M9.5 20v-5h5v5"/></svg>
+          <span class="side-nav__label">Przegląd</span>
+        </a>
+        <a class="side-nav__link" href="#kalendarz" data-view="kalendarz">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>
+          <span class="side-nav__label">Kalendarz</span>
+        </a>
+        <a class="side-nav__link" href="#dostepnosc" data-view="dostepnosc">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          <span class="side-nav__label">Dostępność</span>
+        </a>
+        <a class="side-nav__link" href="#pacjenci" data-view="pacjenci">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M16 5.5a3.2 3.2 0 0 1 0 6M17.5 20a5.5 5.5 0 0 0-3-4.9"/></svg>
+          <span class="side-nav__label">Pacjenci</span>
+        </a>
+        <a class="side-nav__link" href="#recepty" data-view="recepty">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg>
+          <span class="side-nav__label">Recepty</span>
+        </a>
+        <a class="side-nav__link" href="#statystyki" data-view="statystyki">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+          <span class="side-nav__label">Statystyki</span>
+        </a>
+        <a class="side-nav__link" href="#profil" data-view="profil">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M5 21a7 7 0 0 1 14 0"/></svg>
+          <span class="side-nav__label">Profil</span>
+        </a>
+      </nav>
+
+      <a class="btn btn--primary side-nav__cta" href="#recepty" data-view="recepty">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        <span class="side-nav__label">Wystaw receptę</span>
+      </a>
+
+      <div class="side-nav__foot">
+        <div class="side-nav__user">
+          <span class="side-nav__avatar" id="side-avatar" aria-hidden="true"></span>
+          <span class="side-nav__label" id="side-user-name">…</span>
+        </div>
+        <button class="side-nav__logout" type="button" data-logout>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>
+          <span class="side-nav__label">Wyloguj</span>
+        </button>
       </div>
-    </div>
-  </header>
+    </aside>
 
-  <main class="dash" id="main">
-    <div class="container">
-      <div class="dash-hero">
-        <h1 class="dash-hero__title" id="welcome">Panel lekarza</h1>
-        <p class="dash-hero__subtitle">Zarządzaj wizytami, dostępnością i wystawiaj e-recepty.</p>
-      </div>
+    <!-- ======================= MAIN ======================= -->
+    <div class="dash-main">
+      <header class="dash-topbar">
+        <button class="nav-toggle dash-topbar__toggle" id="side-toggle"
+                aria-label="Otwórz menu" aria-expanded="false" aria-controls="side-nav">
+          <span class="nav-toggle__bar"></span><span class="nav-toggle__bar"></span><span class="nav-toggle__bar"></span>
+        </button>
+        <a class="brand" href="index.html" aria-label="Zdrovia">
+          <span class="brand__mark" aria-hidden="true">
+            <svg viewBox="0 0 32 32" width="26" height="26" role="img"><path d="M16 3C10 9 6 12.5 6 18a10 10 0 0 0 20 0c0-5.5-4-9-10-15Z" fill="#0E9F8E" /><path d="M10.5 18h3l1.5-3.2 2.2 5 1.6-3.1h2.7" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          </span>
+          <span class="brand__name">Zdrovia</span>
+        </a>
+        <span class="dash-topbar__user" id="header-user"></span>
+      </header>
 
-      <ul class="stat-tiles" aria-label="Podsumowanie">
-        <li class="stat-tile"><div class="stat-tile__value" id="stat-today">–</div><div class="stat-tile__label">Wizyty dziś</div></li>
-        <li class="stat-tile"><div class="stat-tile__value" id="stat-upcoming">–</div><div class="stat-tile__label">Zaplanowane</div></li>
-        <li class="stat-tile"><div class="stat-tile__value" id="stat-done">–</div><div class="stat-tile__label">Zrealizowane</div></li>
-        <li class="stat-tile"><div class="stat-tile__value" id="stat-rx">–</div><div class="stat-tile__label">Wystawione recepty</div></li>
-      </ul>
+      <main class="dash-content" id="main">
+        <div class="alert alert--error" id="global-alert" role="alert" hidden></div>
 
-      <div class="panel-grid">
-        <!-- LEWA: wizyty -->
-        <div>
-          <section class="panel" aria-labelledby="appts-title">
-            <div class="panel__head">
-              <h2 class="panel__title" id="appts-title">Twoje wizyty</h2>
+        <!-- ============ PRZEGLĄD ============ -->
+        <section class="view is-active" id="view-przeglad" data-view="przeglad" aria-labelledby="v1-title">
+          <div class="view__head">
+            <div>
+              <h1 class="view__title" id="v1-title">Panel lekarza</h1>
+              <p class="view__sub" id="welcome-sub">Witaj 👋</p>
             </div>
-            <div class="panel__body">
-              <div class="data-list" id="appointments-list">
+          </div>
+
+          <ul class="stat-tiles" aria-label="Podsumowanie">
+            <li class="stat-tile"><div class="stat-tile__value" id="stat-week">–</div><div class="stat-tile__label">Wizyty w tym tygodniu</div></li>
+            <li class="stat-tile"><div class="stat-tile__value" id="stat-patients">–</div><div class="stat-tile__label">Unikalni pacjenci</div></li>
+            <li class="stat-tile"><div class="stat-tile__value" id="stat-rating">–</div><div class="stat-tile__label">Średnia ocena</div></li>
+            <li class="stat-tile"><div class="stat-tile__value" id="stat-revenue">–</div><div class="stat-tile__label">Przychód (szac.)</div></li>
+          </ul>
+
+          <div class="overview-grid">
+            <section class="panel" aria-labelledby="today-title">
+              <div class="panel__head"><h2 class="panel__title" id="today-title">Dzisiejsze wizyty</h2></div>
+              <div class="panel__body" id="today-list">
                 <div class="loading-row"><span class="spinner"></span> Wczytywanie…</div>
               </div>
-            </div>
-          </section>
-        </div>
+            </section>
 
-        <!-- PRAWA: recepta + dostępność + profil -->
-        <div>
-          <section class="panel" aria-labelledby="rx-title">
-            <div class="panel__head"><h2 class="panel__title" id="rx-title">Wystaw e-receptę</h2></div>
-            <div class="panel__body">
-              <div class="alert alert--error" id="rx-alert" role="alert" hidden></div>
-              <div class="alert alert--success" id="rx-success" role="status" hidden></div>
-              <form id="rx-form" novalidate>
-                <div class="field">
-                  <label class="field__label" for="rx-appointment">Wizyta / pacjent</label>
-                  <select class="field__input" id="rx-appointment" required>
-                    <option value="">— wybierz wizytę —</option>
-                  </select>
-                </div>
-                <div class="field">
-                  <label class="field__label" for="rx-medication">Lek</label>
-                  <input class="field__input" id="rx-medication" placeholder="np. Amoksycylina 500 mg" required />
-                </div>
-                <div class="field">
-                  <label class="field__label" for="rx-dosage">Dawkowanie</label>
-                  <input class="field__input" id="rx-dosage" placeholder="np. 1 tabletka co 8 godzin" />
-                </div>
-                <div class="field">
-                  <label class="field__label" for="rx-notes">Uwagi</label>
-                  <textarea class="field__input" id="rx-notes" rows="2" placeholder="Zalecenia dla pacjenta…"></textarea>
-                </div>
-                <div class="field">
-                  <label class="field__label" for="rx-valid">Ważna do</label>
-                  <input class="field__input" type="date" id="rx-valid" />
-                </div>
-                <button class="btn btn--primary btn--block" type="submit" id="rx-submit">Wystaw receptę</button>
-              </form>
-            </div>
-          </section>
+            <section class="panel" aria-labelledby="dquick-title">
+              <div class="panel__head"><h2 class="panel__title" id="dquick-title">Szybkie akcje</h2></div>
+              <div class="panel__body quick-actions">
+                <a class="quick-action" href="#recepty" data-view="recepty">
+                  <span class="quick-action__icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg></span>
+                  <span class="quick-action__text"><strong>Wystaw receptę</strong><small>Dla pacjenta po wizycie</small></span>
+                </a>
+                <a class="quick-action" href="#dostepnosc" data-view="dostepnosc">
+                  <span class="quick-action__icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+                  <span class="quick-action__text"><strong>Zarządzaj dostępnością</strong><small>Godziny przyjęć</small></span>
+                </a>
+                <a class="quick-action" href="#statystyki" data-view="statystyki">
+                  <span class="quick-action__icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span>
+                  <span class="quick-action__text"><strong>Statystyki</strong><small>Wizyty i skuteczność</small></span>
+                </a>
+              </div>
+            </section>
+          </div>
+        </section>
 
-          <section class="panel" aria-labelledby="avail-title">
-            <div class="panel__head"><h2 class="panel__title" id="avail-title">Dostępność</h2></div>
-            <div class="panel__body">
-              <div class="alert alert--success" id="avail-success" role="status" hidden></div>
-              <p class="data-item__sub" style="margin-bottom:var(--space-3)">
-                Zaznacz dni i godziny przyjmowania. Pacjenci zobaczą wolne 30-minutowe terminy.
-              </p>
-              <div id="avail-rows"></div>
-              <button class="btn btn--primary btn--block" type="button" id="avail-save"
-                      style="margin-top:var(--space-3)">Zapisz dostępność</button>
-            </div>
-          </section>
+        <!-- ============ KALENDARZ / WIZYTY ============ -->
+        <section class="view" id="view-kalendarz" data-view="kalendarz" aria-labelledby="v2-title" hidden>
+          <div class="view__head"><h1 class="view__title" id="v2-title">Kalendarz wizyt</h1></div>
 
-          <section class="panel" aria-labelledby="profile-title">
-            <div class="panel__head"><h2 class="panel__title" id="profile-title">Profil</h2></div>
-            <div class="panel__body">
-              <div class="alert alert--success" id="profile-success" role="status" hidden></div>
-              <form id="profile-form" novalidate>
-                <div class="field">
-                  <label class="field__label" for="pf-city">Miasto</label>
-                  <input class="field__input" id="pf-city" />
-                </div>
-                <div class="field">
-                  <label class="field__label" for="pf-price">Cena konsultacji (zł)</label>
-                  <input class="field__input" type="number" id="pf-price" min="0" max="100000" />
-                </div>
-                <div class="field">
-                  <label class="field__label" for="pf-bio">Bio</label>
-                  <textarea class="field__input" id="pf-bio" rows="3"></textarea>
-                </div>
-                <button class="btn btn--ghost btn--block" type="submit">Zapisz profil</button>
-              </form>
+          <div class="filters-bar">
+            <div class="tabs" role="tablist" aria-label="Filtr statusu">
+              <button class="tab is-active" type="button" role="tab" aria-selected="true" data-status="all">Wszystkie</button>
+              <button class="tab" type="button" role="tab" aria-selected="false" data-status="zaplanowana">Zaplanowane</button>
+              <button class="tab" type="button" role="tab" aria-selected="false" data-status="zrealizowana">Zrealizowane</button>
+              <button class="tab" type="button" role="tab" aria-selected="false" data-status="anulowana">Anulowane</button>
             </div>
-          </section>
-        </div>
-      </div>
+            <label class="period-select">
+              <span class="visually-hidden">Zakres</span>
+              <select class="field__input" id="cal-period">
+                <option value="all">Cały okres</option>
+                <option value="today">Dziś</option>
+                <option value="week">Ten tydzień</option>
+                <option value="upcoming">Nadchodzące</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="cal-list" id="cal-list"></div>
+        </section>
+
+        <!-- ============ DOSTĘPNOŚĆ ============ -->
+        <section class="view" id="view-dostepnosc" data-view="dostepnosc" aria-labelledby="v3-title" hidden>
+          <div class="view__head">
+            <h1 class="view__title" id="v3-title">Dostępność</h1>
+            <button class="btn btn--primary" type="button" id="avail-save">Zapisz dostępność</button>
+          </div>
+          <p class="view__sub" style="margin-bottom:var(--space-4)">
+            Zaznacz godziny przyjęć. Pacjenci zobaczą wolne 30-minutowe terminy.
+            <span class="avail-legend"><span class="avail-legend__box avail-legend__box--sel"></span>wybrane</span>
+            <span class="avail-legend"><span class="avail-legend__box avail-legend__box--busy"></span>zajęte (wizyta)</span>
+          </p>
+          <div class="avail-days" id="avail-days">
+            <div class="loading-row"><span class="spinner"></span> Wczytywanie…</div>
+          </div>
+        </section>
+
+        <!-- ============ PACJENCI ============ -->
+        <section class="view" id="view-pacjenci" data-view="pacjenci" aria-labelledby="v4-title" hidden>
+          <div class="view__head"><h1 class="view__title" id="v4-title">Pacjenci</h1></div>
+          <div class="field" style="max-width:420px">
+            <label class="visually-hidden" for="patient-search">Szukaj pacjenta</label>
+            <input class="field__input" id="patient-search" type="search" placeholder="Szukaj po imieniu i nazwisku…" />
+          </div>
+          <div class="patient-list" id="patient-list"></div>
+        </section>
+
+        <!-- ============ RECEPTY ============ -->
+        <section class="view" id="view-recepty" data-view="recepty" aria-labelledby="v5-title" hidden>
+          <div class="view__head"><h1 class="view__title" id="v5-title">Recepty</h1></div>
+          <div class="rx-layout">
+            <section class="panel" aria-labelledby="rxf-title">
+              <div class="panel__head"><h2 class="panel__title" id="rxf-title">Wystaw e-receptę</h2></div>
+              <div class="panel__body">
+                <form id="rx-form" novalidate>
+                  <div class="field">
+                    <label class="field__label" for="rx-appointment">Wizyta / pacjent</label>
+                    <select class="field__input" id="rx-appointment" aria-describedby="rx-appointment-error"><option value="">— wybierz wizytę —</option></select>
+                    <span class="field__error" id="rx-appointment-error" aria-live="polite"></span>
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="rx-medication">Lek</label>
+                    <input class="field__input" id="rx-medication" placeholder="np. Amoksycylina 500 mg" aria-describedby="rx-medication-error" />
+                    <span class="field__error" id="rx-medication-error" aria-live="polite"></span>
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="rx-dosage">Dawkowanie</label>
+                    <input class="field__input" id="rx-dosage" placeholder="np. 1 tabletka co 8 godzin" />
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="rx-notes">Uwagi</label>
+                    <textarea class="field__input" id="rx-notes" rows="2" placeholder="Zalecenia dla pacjenta…"></textarea>
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="rx-valid">Ważna do</label>
+                    <input class="field__input" type="date" id="rx-valid" />
+                  </div>
+                  <button class="btn btn--primary btn--block" type="submit" id="rx-submit">Wystaw receptę</button>
+                </form>
+              </div>
+            </section>
+
+            <section class="panel" aria-labelledby="rxh-title">
+              <div class="panel__head">
+                <h2 class="panel__title" id="rxh-title">Historia recept</h2>
+              </div>
+              <div class="panel__body">
+                <div class="field" style="margin-bottom:var(--space-3)">
+                  <label class="visually-hidden" for="rx-filter">Filtruj recepty</label>
+                  <input class="field__input" id="rx-filter" type="search" placeholder="Filtruj po pacjencie lub leku…" />
+                </div>
+                <div class="data-list" id="rx-history"></div>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <!-- ============ STATYSTYKI ============ -->
+        <section class="view" id="view-statystyki" data-view="statystyki" aria-labelledby="v6-title" hidden>
+          <div class="view__head"><h1 class="view__title" id="v6-title">Statystyki</h1></div>
+          <div class="stats-grid">
+            <section class="panel" aria-labelledby="chart1-title">
+              <div class="panel__head"><h2 class="panel__title" id="chart1-title">Wizyty w ostatnich 4 tygodniach</h2></div>
+              <div class="panel__body" id="chart-weeks"></div>
+            </section>
+            <section class="panel" aria-labelledby="chart2-title">
+              <div class="panel__head"><h2 class="panel__title" id="chart2-title">Rozkład wg statusu</h2></div>
+              <div class="panel__body" id="chart-status"></div>
+            </section>
+          </div>
+        </section>
+
+        <!-- ============ PROFIL ============ -->
+        <section class="view" id="view-profil" data-view="profil" aria-labelledby="v7-title" hidden>
+          <div class="view__head"><h1 class="view__title" id="v7-title">Profil zawodowy</h1></div>
+          <div class="profile-grid">
+            <section class="panel" aria-labelledby="pf-title">
+              <div class="panel__head"><h2 class="panel__title" id="pf-title">Dane profilu</h2></div>
+              <div class="panel__body">
+                <form id="profile-form" novalidate>
+                  <div class="field">
+                    <label class="field__label" for="pf-spec">Specjalizacja</label>
+                    <select class="field__input" id="pf-spec">
+                      <option value="internista">Internista</option>
+                      <option value="pediatra">Pediatra</option>
+                      <option value="dermatolog">Dermatolog</option>
+                      <option value="psychiatra">Psychiatra</option>
+                      <option value="ginekolog">Ginekolog</option>
+                      <option value="kardiolog">Kardiolog</option>
+                      <option value="laryngolog">Laryngolog</option>
+                      <option value="endokrynolog">Endokrynolog</option>
+                    </select>
+                  </div>
+                  <div class="form-row">
+                    <div class="field">
+                      <label class="field__label" for="pf-years">Lata doświadczenia</label>
+                      <input class="field__input" id="pf-years" type="number" min="0" max="70" aria-describedby="pf-years-error" />
+                      <span class="field__error" id="pf-years-error" aria-live="polite"></span>
+                    </div>
+                    <div class="field">
+                      <label class="field__label" for="pf-price">Cena konsultacji (zł)</label>
+                      <input class="field__input" id="pf-price" type="number" min="0" max="100000" aria-describedby="pf-price-error" />
+                      <span class="field__error" id="pf-price-error" aria-live="polite"></span>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="pf-city">Miasto</label>
+                    <input class="field__input" id="pf-city" />
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="pf-bio">Bio</label>
+                    <textarea class="field__input" id="pf-bio" rows="4" maxlength="600"></textarea>
+                  </div>
+                  <button class="btn btn--primary" type="submit" id="profile-save">Zapisz profil</button>
+                </form>
+              </div>
+            </section>
+
+            <section class="panel" aria-labelledby="prev-title">
+              <div class="panel__head"><h2 class="panel__title" id="prev-title">Podgląd dla pacjentów</h2></div>
+              <div class="panel__body">
+                <p class="data-item__sub" style="margin-bottom:var(--space-3)">Tak Twoja karta wygląda na liście lekarzy:</p>
+                <div class="doc-preview" id="doc-preview"></div>
+              </div>
+            </section>
+          </div>
+        </section>
+      </main>
     </div>
-  </main>
+
+    <div class="side-nav__scrim" id="side-scrim" hidden></div>
+  </div>
+
+  <!-- ======================= DOLNA NAWIGACJA (mobile) ======================= -->
+  <nav class="bottom-nav" aria-label="Nawigacja panelu (mobile)">
+    <a class="bottom-nav__link" href="#przeglad" data-view="przeglad">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 4l9 6.5"/><path d="M5 9.5V20h14V9.5"/></svg>
+      <span>Przegląd</span>
+    </a>
+    <a class="bottom-nav__link" href="#kalendarz" data-view="kalendarz">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>
+      <span>Kalendarz</span>
+    </a>
+    <a class="bottom-nav__link bottom-nav__link--cta" href="#recepty" data-view="recepty" aria-label="Wystaw receptę">
+      <span class="bottom-nav__cta" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
+    </a>
+    <a class="bottom-nav__link" href="#pacjenci" data-view="pacjenci">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M16 5.5a3.2 3.2 0 0 1 0 6M17.5 20a5.5 5.5 0 0 0-3-4.9"/></svg>
+      <span>Pacjenci</span>
+    </a>
+    <a class="bottom-nav__link" href="#profil" data-view="profil">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M5 21a7 7 0 0 1 14 0"/></svg>
+      <span>Profil</span>
+    </a>
+  </nav>
 
   <script src="script/api.js" defer></script>
   <script src="script/dash-common.js" defer></script>

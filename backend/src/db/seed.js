@@ -145,6 +145,60 @@ const reset = db.transaction(() => {
     day(24), "1042-7788-3159"
   );
 
+  // --- Dodatkowi pacjenci + bogaty grafik dla dr Anny Kowalskiej (do demo panelu lekarza) ---
+  const extraPatients = [
+    { first: "Katarzyna", last: "Nowak",    phone: "600 200 201", birth: "1988-03-14" },
+    { first: "Marek",     last: "Zieliński", phone: "600 200 202", birth: "1979-11-02" },
+    { first: "Alicja",    last: "Wójcik",    phone: "600 200 203", birth: "1995-07-21" },
+  ];
+  const extraIds = extraPatients.map((p) => {
+    const u = db
+      .prepare("INSERT INTO users (email, password_hash, role) VALUES (?, ?, 'patient')")
+      .run(`${slug(p.first)}.${slug(p.last)}@example.com`, passwordHash);
+    db.prepare(
+      "INSERT INTO patient_profiles (user_id, first_name, last_name, phone, birth_date) VALUES (?, ?, ?, ?, ?)"
+    ).run(u.lastInsertRowid, p.first, p.last, p.phone, p.birth);
+    return u.lastInsertRowid;
+  });
+  const pool = [patientId, ...extraIds];
+
+  const rxIns = db.prepare(
+    `INSERT INTO prescriptions
+       (appointment_id, patient_id, doctor_id, medication, dosage, notes, valid_until, code)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+  );
+  const meds = ["Amoksycylina 500 mg", "Ibuprom 200 mg", "Euthyrox 50 µg", "Amlodypina 5 mg"];
+
+  // [offset dni, godzina, status, forma, usługa, cena, indeks pacjenta]
+  const annaSchedule = [
+    [-22, "09:00", "zrealizowana", "wideo",   "konsultacja", 99,  0],
+    [-20, "11:30", "zrealizowana", "czat",    "recepta",     59,  1],
+    [-15, "14:00", "zrealizowana", "wideo",   "konsultacja", 99,  2],
+    [-12, "10:30", "anulowana",    "wideo",   "konsultacja", 99,  1],
+    [-8,  "16:00", "zrealizowana", "telefon", "zwolnienie",  79,  3],
+    [-3,  "12:00", "zrealizowana", "wideo",   "konsultacja", 99,  2],
+    [-1,  "09:30", "zrealizowana", "czat",    "recepta",     59,  0],
+    [1,   "10:00", "zaplanowana",  "wideo",   "konsultacja", 99,  0],
+    [2,   "13:30", "zaplanowana",  "wideo",   "recepta",     59,  1],
+    [4,   "15:00", "zaplanowana",  "czat",    "konsultacja", 99,  3],
+  ];
+  annaSchedule.forEach((row, i) => {
+    const [off, time, status, ctype, service, price, pi] = row;
+    const pid = pool[pi % pool.length];
+    const info = apptIns.run(
+      pid, annaId, day(off), time, status, ctype, service,
+      "Konsultacja — dolegliwości opisane w wywiadzie.", price, "blik"
+    );
+    if (status === "zrealizowana" && (service === "recepta" || i % 3 === 0)) {
+      rxIns.run(
+        info.lastInsertRowid, pid, annaId,
+        meds[i % meds.length], i % 2 ? "1 tabletka 2× dziennie" : "1 tabletka co 8 godzin",
+        "Przyjmować po posiłku.", day(20 + i),
+        `${1000 + i}-${2000 + i}-${3000 + i}`
+      );
+    }
+  });
+
   return { doctors: doctors.length, patientEmail };
 });
 
