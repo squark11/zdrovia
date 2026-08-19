@@ -1,0 +1,128 @@
+{
+  "name": "Zdrovia — AI Triage (wstępna kwalifikacja objawów)",
+  "meta": {
+    "description": "REFERENCYJNY szkielet workflow. Nie jest w pełni funkcjonalny bez podłączonych credentiali (Chat Model) i ustawionego sekretu. Pokazuje strukturę węzłów oczekiwaną przez backend Zdrovia: Webhook -> walidacja sekretu -> AI Agent -> Structured Output -> Respond to Webhook."
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "triage",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook (POST /triage)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "zdrovia-triage"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "typeValidation": "strict" },
+          "combinator": "and",
+          "conditions": [
+            {
+              "leftValue": "={{ $json.headers['x-webhook-secret'] }}",
+              "rightValue": "={{ $env.TRIAGE_WEBHOOK_SECRET }}",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "if-secret",
+      "name": "Sprawdź X-Webhook-Secret",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [480, 300],
+      "notes": "Odrzuca żądania bez poprawnego sekretu (ustaw TRIAGE_WEBHOOK_SECRET = N8N_WEBHOOK_SECRET z backendu)."
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.message }}",
+        "options": {
+          "systemMessage": "Jesteś asystentem wstępnej kwalifikacji objawów polskiej platformy telemedycznej. ZASADY: (1) NIGDY nie stawiasz diagnozy ani nie przepisujesz leków. (2) Zadaj 1-3 krótkie pytania doprecyzowujące objawy (czas trwania, nasilenie, dodatkowe dolegliwości). (3) Rozpoznawaj RED FLAGS: ból w klatce piersiowej, trudności w oddychaniu/duszność, silne krwawienie, utrata przytomności, objawy udaru (niedowład, zaburzenia mowy), drgawki, myśli samobójcze. Jeśli wystąpią — ustaw isUrgent=true, shouldEndConversation=true i w reply poleć kontakt z 112/SOR. (4) W przeciwnym razie po zebraniu informacji zasugeruj JEDNĄ specjalizację z listy: internista, pediatra, dermatolog, psychiatra, ginekolog, kardiolog, laryngolog, endokrynolog (pole suggestedSpecialty) i ustaw shouldEndConversation=true. (5) Odpowiadaj po polsku, empatycznie i zwięźle. Zawsze zwracaj wynik w wymaganym formacie JSON."
+        }
+      },
+      "id": "ai-agent",
+      "name": "AI Agent (triage)",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [720, 280]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "options": { "temperature": 0.2 }
+      },
+      "id": "chat-model",
+      "name": "Chat Model (OpenAI/Anthropic)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [640, 480],
+      "notes": "Podłącz własne credentiale. Można zamienić na węzeł Anthropic Chat Model."
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"reply\": \"string\",\n  \"suggestedSpecialty\": \"dermatolog\",\n  \"isUrgent\": false,\n  \"shouldEndConversation\": false\n}"
+      },
+      "id": "output-parser",
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [880, 480],
+      "notes": "Wymusza JSON zgodny z tym, czego oczekuje backend."
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.output }}",
+        "options": {}
+      },
+      "id": "respond-ok",
+      "name": "Respond to Webhook (JSON)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1120, 280]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseCode": 401,
+        "responseBody": "={ \"error\": \"invalid webhook secret\" }",
+        "options": {}
+      },
+      "id": "respond-401",
+      "name": "Respond 401 (zły sekret)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [720, 460]
+    }
+  ],
+  "connections": {
+    "Webhook (POST /triage)": {
+      "main": [[{ "node": "Sprawdź X-Webhook-Secret", "type": "main", "index": 0 }]]
+    },
+    "Sprawdź X-Webhook-Secret": {
+      "main": [
+        [{ "node": "AI Agent (triage)", "type": "main", "index": 0 }],
+        [{ "node": "Respond 401 (zły sekret)", "type": "main", "index": 0 }]
+      ]
+    },
+    "Chat Model (OpenAI/Anthropic)": {
+      "ai_languageModel": [[{ "node": "AI Agent (triage)", "type": "ai_languageModel", "index": 0 }]]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [[{ "node": "AI Agent (triage)", "type": "ai_outputParser", "index": 0 }]]
+    },
+    "AI Agent (triage)": {
+      "main": [[{ "node": "Respond to Webhook (JSON)", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "pinData": {}
+}
