@@ -9,6 +9,8 @@ const db = require("../db");
 const { ApiError } = require("../middleware/error.middleware");
 const { isSlotBookable } = require("../services/slots.service");
 const { SERVICES, priceFor } = require("../utils/services");
+const email = require("../services/email.service");
+const realtime = require("../services/realtime.service");
 
 /* Wzbogacony wiersz wizyty (z danymi lekarza i pacjenta). */
 const SELECT_APPT = `
@@ -89,7 +91,21 @@ function create(req, res) {
       .run(req.user.id, doctorId, date, time, consultationType || "wideo",
            service || "konsultacja", reason || null, price, paid, paymentMethod || null);
     const row = db.prepare(`${SELECT_APPT} WHERE a.id = ?`).get(info.lastInsertRowid);
-    res.status(201).json({ appointment: mapAppt(row) });
+    const appt = mapAppt(row);
+    res.status(201).json({ appointment: appt });
+
+    // Real-time: powiadom lekarza o nowej wizycie w jego kalendarzu.
+    realtime.emitToUser(doctorId, "appointment:new", { appointment: appt });
+
+    // Powiadomienie e-mail (poza ścieżką odpowiedzi — nie blokuje ani nie psuje
+    // rezerwacji, jeśli SMTP zawiedzie; notify() sam łapie błędy i sprawdza flagę).
+    email
+      .sendAppointmentConfirmation(
+        appt,
+        { firstName: row.patient_first, email: row.patient_email },
+        { name: appt.doctor.name }
+      )
+      .catch(() => {});
   } catch (e) {
     // UNIQUE(doctor_id,date,time) → slot właśnie zajęty.
     if (String(e.message).includes("UNIQUE")) {
@@ -120,7 +136,12 @@ function update(req, res) {
 
   db.prepare("UPDATE appointments SET status = ? WHERE id = ?").run(status, id);
   const row = db.prepare(`${SELECT_APPT} WHERE a.id = ?`).get(id);
-  res.json({ appointment: mapAppt(row) });
+  const mapped = mapAppt(row);
+  res.json({ appointment: mapped });
+
+  // Real-time: powiadom drugą stronę (tę, która NIE wykonała zmiany).
+  const other = req.user.id === mapped.patient.id ? mapped.doctor.id : mapped.patient.id;
+  realtime.emitToUser(other, "appointment:updated", { appointment: mapped });
 }
 
 module.exports = { list, create, update };

@@ -555,3 +555,24 @@
   box-shadow: 0 12px 26px rgba(214, 71, 47, 0.34);
   transform: translateY(-2px);
 }
+
+/* -------------------------------------------------------------
+   Przełącznik motywu (jasny / ciemny). Ikona zależy od trybu:
+   księżyc w trybie jasnym (klik → ciemny), słońce w ciemnym.
+------------------------------------------------------------- */
+.theme-toggle {
+  width: 40px; height: 40px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1.5px solid var(--c-line);
+  background: var(--c-surface);
+  color: var(--c-ink-soft);
+  transition: color var(--transition), border-color var(--transition), background var(--transition);
+}
+.theme-toggle:hover { color: var(--c-primary-dark); border-color: var(--c-primary); }
+.theme-toggle svg { width: 19px; height: 19px; }
+.theme-toggle .ico-sun { display: none; }
+.theme-toggle .ico-moon { display: block; }
+:root[data-theme="dark"] .theme-toggle .ico-sun { display: block; }
+:root[data-theme="dark"] .theme-toggle .ico-moon { display: none; }

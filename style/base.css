@@ -30,6 +30,7 @@
   --c-bg:         #F6FAF9;   /* tło strony */
   --c-surface:    #FFFFFF;   /* karty */
   --c-ink-invert: #FFFFFF;
+  --c-glass:      rgba(255, 255, 255, 0.9);  /* półprzezroczyste sticky nagłówki */
 
   /* Kolor gwiazdek oceny */
   --c-star: #FFB020;
@@ -70,6 +71,80 @@
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --transition: 220ms var(--ease);
 }
+
+/* -------------------------------------------------------------
+   1b. Ciemny motyw (dark mode).
+   Ustawiany atrybutem data-theme="dark" na <html> (patrz theme.js
+   + inline-skrypt w <head>, który zapobiega mignięciu / FOUC).
+   Kolory dobrane ręcznie pod kontrast WCAG AA (nie surowa inwersja):
+   mięta rozjaśniona na ciemnym tle, ciepłe neutralne zamiast
+   „szpitalnego" chłodu, głębsze cienie.
+------------------------------------------------------------- */
+:root[data-theme="dark"] {
+  /* Marka — rozjaśniona, by zachować kontrast na ciemnym tle */
+  --c-primary:        #23C7B2;
+  --c-primary-dark:   #5FE0CF;   /* linki / tekst akcentowy (jasny na ciemnym) */
+  --c-primary-darker: #8CEADD;
+  --c-primary-tint:   #12312C;   /* ciemne „miętowe" tła sekcji/ikon */
+  --c-primary-tint-2: #17423A;
+
+  --c-accent:         #FF8A6B;
+  --c-accent-dark:    #FFA184;   /* akcent tekstowy jaśniejszy na ciemnym */
+
+  /* Neutralne */
+  --c-ink:        #EAF2F0;   /* nagłówki / główny tekst */
+  --c-ink-soft:   #C4D3CE;   /* tekst drugorzędny */
+  --c-ink-muted:  #8DA39D;   /* podpisy */
+  --c-line:       #27332F;   /* obramowania */
+  --c-line-soft:  #1D2825;
+  --c-bg:         #0E1917;   /* tło strony */
+  --c-surface:    #15211E;   /* karty */
+  --c-ink-invert: #FFFFFF;   /* tekst na wypełnieniu marki */
+  --c-glass:      rgba(14, 25, 23, 0.85);
+
+  --c-star: #FFC24D;
+
+  /* Cienie głębsze (na ciemnym tle liczy się czerń, nie zieleń) */
+  --shadow-sm:  0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow:     0 6px 20px rgba(0, 0, 0, 0.45);
+  --shadow-md:  0 12px 34px rgba(0, 0, 0, 0.5);
+  --shadow-lg:  0 24px 60px rgba(0, 0, 0, 0.6);
+}
+
+/* Nadpisania powierzchni z zahardkodowanymi kolorami (tryb jasny bez zmian).
+   Grupujemy wg znaczenia: błąd / sukces / info / anulowane / ostrzeżenie. */
+:root[data-theme="dark"] .alert--error,
+:root[data-theme="dark"] .triage-urgent {
+  background: #351E1D; color: #F3A9A0; border-color: #5A2D2B;
+}
+:root[data-theme="dark"] .alert--success,
+:root[data-theme="dark"] .badge--today,
+:root[data-theme="dark"] .status--zrealizowana {
+  background: #10322A; color: #4FD6A6; border-color: #1E4B3E;
+}
+:root[data-theme="dark"] .status--zaplanowana {
+  background: #142740; color: #86B6F2;
+}
+:root[data-theme="dark"] .status--anulowana {
+  background: #2E2625; color: #CCA0A0;
+}
+:root[data-theme="dark"] .avail-legend__box--busy {
+  background: #2E2625; border-color: #4A3838;
+}
+:root[data-theme="dark"] .avail-slot.is-busy {
+  background: #2A2322; border-color: #4A3838; color: #CCA0A0;
+}
+:root[data-theme="dark"] .badge--soon {
+  background: #3A2713; color: #F0A968;
+}
+:root[data-theme="dark"] .pay-note,
+:root[data-theme="dark"] .adblock-notice,
+:root[data-theme="dark"] .triage-disclaimer,
+:root[data-theme="dark"] .stat-tile--alert {
+  background: #33280F; border-color: #574325; color: #E9C188;
+}
+:root[data-theme="dark"] .pay-note strong,
+:root[data-theme="dark"] .triage-disclaimer strong { color: #F3D6A3; }
 
 /* -------------------------------------------------------------
    2. Reset — nowoczesny, minimalny.

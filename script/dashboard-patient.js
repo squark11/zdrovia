@@ -47,6 +47,22 @@
     showView((location.hash || "#przeglad").slice(1));
 
     await loadAll();
+    setupRealtime();
+  }
+
+  /* Aktualizacje na żywo (Socket.io): nowa recepta / zmiana statusu wizyty. */
+  function setupRealtime() {
+    const rt = window.Zdrovia.realtime;
+    if (!rt) return;
+    rt.on("prescription:new", () => {
+      dash.toast("Masz nową e-receptę 💊", "success");
+      loadAll(true);
+    });
+    rt.on("appointment:updated", () => {
+      dash.toast("Zmieniono status Twojej wizyty.", "info");
+      loadAll(true);
+    });
+    rt.connect();
   }
 
   /* ---------- Pomocnicze ---------- */
@@ -83,10 +99,12 @@
   }
 
   /* ---------- Ładowanie danych ---------- */
-  async function loadAll() {
-    el("appt-grid").innerHTML = skeletons(4);
-    el("rx-grid").innerHTML = skeletons(3);
-    el("next-visit").innerHTML = '<div class="loading-row"><span class="spinner"></span> Wczytywanie…</div>';
+  async function loadAll(quiet) {
+    if (!quiet) {
+      el("appt-grid").innerHTML = skeletons(4);
+      el("rx-grid").innerHTML = skeletons(3);
+      el("next-visit").innerHTML = '<div class="loading-row"><span class="spinner"></span> Wczytywanie…</div>';
+    }
     try {
       const [a, p] = await Promise.all([api.get("/appointments"), api.get("/prescriptions")]);
       appointments = a.appointments;

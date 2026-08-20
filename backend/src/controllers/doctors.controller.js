@@ -18,7 +18,11 @@ function getDoctorRow(id) {
 function list(req, res) {
   const { specialization, search } = req.query;
   let sql = "SELECT * FROM doctor_profiles";
-  const where = [];
+  // Publicznie widoczni tylko lekarze zatwierdzeni przez admina i nie zawieszeni.
+  const where = [
+    "verification_status = 'approved'",
+    "user_id NOT IN (SELECT id FROM users WHERE is_suspended = 1)",
+  ];
   const params = [];
 
   if (specialization && specialization !== "all") {

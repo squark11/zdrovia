@@ -33,7 +33,8 @@ db.exec(`
     id            INTEGER PRIMARY KEY AUTOINCREMENT,
     email         TEXT NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
-    role          TEXT NOT NULL CHECK (role IN ('patient','doctor')),
+    role          TEXT NOT NULL CHECK (role IN ('patient','doctor','admin')),
+    is_suspended  INTEGER NOT NULL DEFAULT 0,  -- zawieszone konto nie może się zalogować
     created_at    TEXT NOT NULL DEFAULT (datetime('now'))
   );
 
@@ -58,7 +59,9 @@ db.exec(`
     reviews_count      INTEGER DEFAULT 0,
     city               TEXT,
     languages          TEXT,          -- JSON: ["polski","angielski"]
-    color              TEXT DEFAULT '#0E9F8E'
+    color              TEXT DEFAULT '#0E9F8E',
+    verification_status TEXT NOT NULL DEFAULT 'pending', -- pending | approved | rejected
+    verification_reason TEXT
   );
 
   CREATE TABLE IF NOT EXISTS appointments (
@@ -111,6 +114,14 @@ db.exec(`
     updated_at          TEXT
   );
 
+  CREATE TABLE IF NOT EXISTS platform_settings (
+    key        TEXT PRIMARY KEY,
+    value      TEXT,                          -- dla is_secret=1: zaszyfrowane (iv:tag:cipher)
+    is_secret  INTEGER NOT NULL DEFAULT 0,
+    updated_at TEXT,
+    updated_by INTEGER REFERENCES users(id) ON DELETE SET NULL
+  );
+
   CREATE INDEX IF NOT EXISTS idx_appt_patient ON appointments(patient_id);
   CREATE INDEX IF NOT EXISTS idx_appt_doctor  ON appointments(doctor_id);
   CREATE INDEX IF NOT EXISTS idx_presc_patient ON prescriptions(patient_id);
@@ -134,5 +145,9 @@ ensureColumn("appointments", "reason", "TEXT");
 ensureColumn("appointments", "price", "INTEGER");
 ensureColumn("appointments", "paid", "INTEGER DEFAULT 0");
 ensureColumn("appointments", "payment_method", "TEXT");
+ensureColumn("appointments", "reminder_sent", "INTEGER NOT NULL DEFAULT 0");
+ensureColumn("users", "is_suspended", "INTEGER NOT NULL DEFAULT 0");
+ensureColumn("doctor_profiles", "verification_status", "TEXT NOT NULL DEFAULT 'pending'");
+ensureColumn("doctor_profiles", "verification_reason", "TEXT");
 
 module.exports = db;

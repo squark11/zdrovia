@@ -53,6 +53,22 @@
 
     showView((location.hash || "#przeglad").slice(1));
     await loadAll();
+    setupRealtime();
+  }
+
+  /* Aktualizacje na żywo (Socket.io): nowa wizyta / zmiana statusu przez pacjenta. */
+  function setupRealtime() {
+    const rt = window.Zdrovia.realtime;
+    if (!rt) return;
+    rt.on("appointment:new", () => {
+      dash.toast("Nowa wizyta w Twoim kalendarzu.", "success");
+      loadAll(true);
+    });
+    rt.on("appointment:updated", () => {
+      dash.toast("Pacjent zmienił wizytę.", "info");
+      loadAll(true);
+    });
+    rt.connect();
   }
 
   /* ---------- Pomocnicze ---------- */
@@ -89,9 +105,11 @@
   const skeletons = (n) => Array.from({ length: n }, () => '<div class="skeleton skel-card"></div>').join("");
 
   /* ---------- Ładowanie ---------- */
-  async function loadAll() {
-    el("today-list").innerHTML = '<div class="loading-row"><span class="spinner"></span> Wczytywanie…</div>';
-    el("cal-list").innerHTML = skeletons(3);
+  async function loadAll(quiet) {
+    if (!quiet) {
+      el("today-list").innerHTML = '<div class="loading-row"><span class="spinner"></span> Wczytywanie…</div>';
+      el("cal-list").innerHTML = skeletons(3);
+    }
     try {
       const [a, p] = await Promise.all([api.get("/appointments"), api.get("/prescriptions")]);
       appointments = a.appointments;

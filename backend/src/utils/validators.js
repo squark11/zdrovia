@@ -103,6 +103,33 @@ const prescriptionCreateSchema = z.object({
   validUntil: date.optional(),
 });
 
+const optEmail = z.union([z.literal(""), z.string().trim().email("Nieprawidłowy e-mail")]).optional();
+const optUrl = z.union([z.literal(""), z.string().trim().url("Nieprawidłowy URL")]).optional();
+const settingsUpdateSchema = z.object({
+  app_name: z.string().trim().max(60).optional(),
+  support_email: optEmail,
+  smtp_host: z.string().trim().max(200).optional(),
+  smtp_port: z.coerce.number().int().min(1).max(65535).optional(),
+  smtp_user: z.string().trim().max(200).optional(),
+  smtp_password: z.string().max(500).optional(),
+  smtp_from: z.string().trim().max(200).optional(),
+  n8n_webhook_url: optUrl,
+  n8n_webhook_secret: z.string().max(500).optional(),
+  enable_email_notifications: z.boolean().optional(),
+  enable_realtime: z.boolean().optional(),
+  enable_dark_mode_default: z.boolean().optional(),
+  clear: z.array(z.string()).max(10).optional(),
+});
+
+const adminVerifySchema = z.object({
+  status: z.enum(["approved", "rejected"]),
+  reason: z.string().trim().max(500).optional(),
+});
+
+const adminUserStatusSchema = z.object({
+  suspended: z.boolean(),
+});
+
 const triageChatSchema = z.object({
   sessionId: z.string().trim().min(8, "Nieprawidłowy identyfikator sesji").max(100),
   message: z.string().trim().min(1, "Wpisz wiadomość").max(1000, "Wiadomość jest za długa (maks. 1000 znaków)"),
@@ -116,6 +143,9 @@ module.exports = {
   registerSchema,
   loginSchema,
   changePasswordSchema,
+  adminVerifySchema,
+  adminUserStatusSchema,
+  settingsUpdateSchema,
   triageChatSchema,
   patientUpdateSchema,
   doctorUpdateSchema,

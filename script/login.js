@@ -11,7 +11,9 @@
   if (!api || !form) return;
 
   const dashFor = (role) =>
-    role === "doctor" ? "dashboard-doctor.html" : "dashboard-patient.html";
+    role === "admin" ? "dashboard-admin.html"
+    : role === "doctor" ? "dashboard-doctor.html"
+    : "dashboard-patient.html";
 
   // Cel przekierowania po zalogowaniu (?next=...), np. z modala/rezerwacji.
   const params = new URLSearchParams(location.search);

@@ -78,8 +78,9 @@ const reset = db.transaction(() => {
   const insertDoc = db.prepare(
     `INSERT INTO doctor_profiles
        (user_id, first_name, last_name, specialization, pwz_number, bio,
-        years_experience, consultation_price, avg_rating, reviews_count, city, languages, color)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        years_experience, consultation_price, avg_rating, reviews_count, city, languages, color,
+        verification_status)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'approved')`
   );
   const insertAvail = db.prepare(
     "INSERT INTO availability (doctor_id, weekday, start_time, end_time) VALUES (?, ?, ?, ?)"

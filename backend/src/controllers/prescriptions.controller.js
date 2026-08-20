@@ -8,6 +8,8 @@
 const crypto = require("crypto");
 const db = require("../db");
 const { ApiError } = require("../middleware/error.middleware");
+const email = require("../services/email.service");
+const realtime = require("../services/realtime.service");
 
 const SELECT_PRESC = `
   SELECT p.*,
@@ -79,7 +81,22 @@ function create(req, res) {
 
   const id = tx();
   const row = db.prepare(`${SELECT_PRESC} WHERE p.id = ?`).get(id);
-  res.status(201).json({ prescription: mapPresc(row) });
+  const presc = mapPresc(row);
+  res.status(201).json({ prescription: presc });
+
+  // Real-time: pacjent od razu widzi nową receptę (oraz zmianę statusu wizyty).
+  realtime.emitToUser(appt.patient_id, "prescription:new", { prescription: presc });
+
+  // Powiadomienie e-mail do pacjenta (nie blokuje odpowiedzi; e-mail pacjenta
+  // dobieramy osobno, bo SELECT_PRESC go nie zwraca — nie trafia do frontu).
+  const patientUser = db.prepare("SELECT email FROM users WHERE id = ?").get(appt.patient_id);
+  email
+    .sendNewPrescriptionNotification(
+      { medication: presc.medication, dosage: presc.dosage, code: presc.code, validUntil: presc.validUntil },
+      { firstName: row.patient_first, email: patientUser && patientUser.email },
+      { name: presc.doctor.name }
+    )
+    .catch(() => {});
 }
 
 module.exports = { list, create };

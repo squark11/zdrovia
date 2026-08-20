@@ -31,6 +31,7 @@ function publicDoctor(row) {
     city: row.city,
     languages: parseLanguages(row.languages),
     color: row.color,
+    verificationStatus: row.verification_status,
   };
 }
 

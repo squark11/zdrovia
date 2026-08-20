@@ -26,7 +26,9 @@
         const { user } = await api.me();
         if (role && user.role !== role) {
           window.location.href =
-            user.role === "doctor" ? "dashboard-doctor.html" : "dashboard-patient.html";
+            user.role === "admin" ? "dashboard-admin.html"
+            : user.role === "doctor" ? "dashboard-doctor.html"
+            : "dashboard-patient.html";
           return null;
         }
         return user;

@@ -16,7 +16,10 @@
     .me()
     .then((res) => {
       const u = res.user;
-      const dash = u.role === "doctor" ? "dashboard-doctor.html" : "dashboard-patient.html";
+      const dash =
+        u.role === "admin" ? "dashboard-admin.html"
+        : u.role === "doctor" ? "dashboard-doctor.html"
+        : "dashboard-patient.html";
       el.innerHTML = `
         <a class="main-nav__login" href="${dash}">Mój panel</a>
         <button class="btn btn--ghost main-nav__cta" type="button" id="nav-logout">Wyloguj</button>`;

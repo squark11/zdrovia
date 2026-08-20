@@ -78,6 +78,9 @@ function login(req, res) {
   if (!row || !bcrypt.compareSync(password, row.password_hash)) {
     throw new ApiError(401, "Nieprawidłowy e-mail lub hasło");
   }
+  if (row.is_suspended) {
+    throw new ApiError(403, "To konto zostało zawieszone. Skontaktuj się z administratorem platformy.");
+  }
   issueSession(res, { id: row.id, email: row.email, role: row.role, created_at: row.created_at });
 }
 
