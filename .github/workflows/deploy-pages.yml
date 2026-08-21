@@ -1,0 +1,68 @@
+# Publikacja frontendu Zdrovia na GitHub Pages.
+#
+# Na Pages trafiają wyłącznie statyki (HTML/CSS/JS/grafiki) — katalog
+# backend/ jest wykluczony, bo zawiera kod serwera i konfigurację.
+# Backend API stoi osobno; jego adres ustawia script/config.js.
+name: Deploy frontend na GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "backend/**"
+      - "n8n/**"
+      - "README.md"
+  # Pozwala uruchomić publikację ręcznie z zakładki Actions.
+  workflow_dispatch:
+
+# Uprawnienia wymagane przez oficjalne akcje Pages (OIDC + zapis do Pages).
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Jedna publikacja naraz; nie przerywamy trwającej, żeby nie zostawić
+# Pages w połowie wdrożenia.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Przygotuj katalog publikacji
+        run: |
+          mkdir -p _site
+          # Kopiujemy tylko to, co ma trafić do przeglądarki.
+          cp *.html _site/
+          cp -r script style images assets _site/
+          # .nojekyll — bez tego GitHub Pages ignoruje pliki i katalogi
+          # zaczynające się od podkreślenia.
+          touch _site/.nojekyll
+
+      - name: Sprawdź, czy nie publikujemy sekretów
+        run: |
+          if find _site -name ".env" -o -name "*.pem" -o -name "*.pfx" -o -name "*.db" | grep -q .; then
+            echo "BŁĄD: w katalogu publikacji znalazły się pliki wrażliwe."
+            find _site -name ".env" -o -name "*.pem" -o -name "*.pfx" -o -name "*.db"
+            exit 1
+          fi
+          echo "OK — brak plików wrażliwych."
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -393,6 +393,130 @@ Sprawdzone też: podwójna rezerwacja → `409`, brak uprawnień → `403`, wali
 
 ---
 
+---
+
+## Wdrożenie: frontend na GitHub Pages + backend na własnym serwerze
+
+Docelowy podział: **statyki na GitHub Pages**, **API i n8n na serwerze**.
+Front i backend są wtedy na różnych originach, co narzuca kilka wymagań.
+
+### Adres API — `script/config.js`
+
+Frontend nie zna adresu backendu z originu strony, więc ustala go
+[`script/config.js`](script/config.js), ładowany przed `api.js` w każdym HTML-u.
+Kolejność rozstrzygania:
+
+1. `window.ZDROVIA_API_ORIGIN` ustawione ręcznie przed skryptem,
+2. parametr `?api=https://...` w adresie (doraźne testy innego backendu),
+3. `file://` lub port typowego serwera statycznego (`8123`, `5173`, …) → `DEV_API_ORIGIN`,
+4. inny port na `localhost` → **ten sam origin** (backend serwuje też statyki),
+5. dowolny inny host → `PRODUCTION_API_ORIGIN`.
+
+Zmiana adresu produkcyjnego API = edycja jednej stałej na górze tego pliku.
+
+### HTTPS jest wymagany, nie opcjonalny
+
+GitHub Pages serwuje wyłącznie po HTTPS. Strona z `https://` **nie wykona**
+żądania do `http://` — przeglądarka zablokuje je jako *mixed content*, bez
+możliwości obejścia po stronie kodu. Backend musi więc mieć:
+
+- certyfikat **publicznie zaufany** (Let's Encrypt lub komercyjny; self-signed
+  nie wystarczy — `fetch` odrzuci go bez możliwości kliknięcia „kontynuuj"),
+- adres zgodny z nazwą w certyfikacie — **nie gołe IP**, bo certyfikaty
+  Let's Encrypt wystawiane są na nazwy domenowe.
+
+Konfiguracja w `.env` — jeden z dwóch wariantów:
+
+```
+# PEM (typowe dla Let's Encrypt / certbota)
+SSL_CERT_FILE=C:/certs/zdrovia/cert.pem
+SSL_KEY_FILE=C:/certs/zdrovia/key.pem
+
+# albo PFX/PKCS#12 (wygodne na Windows)
+SSL_PFX_FILE=C:/certs/zdrovia/zdrovia.pfx
+SSL_PFX_PASSPHRASE=...
+```
+
+Bez tych zmiennych serwer wstaje po HTTP i wypisuje ostrzeżenie w logu.
+Błąd odczytu certyfikatu **przerywa start** — nie ma cichego fallbacku na HTTP,
+żeby nie wystawić tokenów i danych medycznych nieszyfrowanym łączem.
+
+### Ciasteczka a inny origin
+
+Przy froncie na osobnym hoście przeglądarka **nie wyśle** ciasteczka
+`SameSite=Lax`, więc uwierzytelnienie opiera się na nagłówku
+`Authorization: Bearer` (token z `localStorage`) — patrz sekcja
+[Bezpieczeństwo tokenu](#bezpieczeństwo-tokenu-httponly-cookie-vs-localstorage).
+`COOKIE_SAMESITE=none` przywróciłoby ciasteczka cross-site, ale **znosi wbudowaną
+ochronę przed CSRF** — ustawiaj tylko razem z osobnym zabezpieczeniem CSRF.
+
+### CORS
+
+`CLIENT_ORIGIN` przyjmuje **sam origin**, bez ścieżki. Dla GitHub Pages jest to
+`https://uzytkownik.github.io`, a **nie** `https://uzytkownik.github.io/repo/`.
+Origin spoza listy nie dostaje nagłówka `Access-Control-Allow-Origin`
+i przeglądarka odrzuca odpowiedź.
+
+### Publikacja frontendu
+
+[`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) publikuje
+statyki przy każdym pushu do `main`. Do `_site/` trafiają wyłącznie HTML, `script/`,
+`style/`, `images/` i `assets/` — katalog `backend/` jest wykluczony, a osobny krok
+przerywa build, jeśli w katalogu publikacji pojawi się `.env`, `*.pem`, `*.pfx` lub `*.db`.
+
+Jednorazowo w repozytorium: **Settings → Pages → Source: GitHub Actions**.
+
+Nawigacja w projekcie jest w całości relatywna (`login.html`, a nie `/login.html`),
+więc podkatalog `/<repo>/` na Pages działa bez zmian w kodzie.
+
+### Socket.io przy dwóch originach
+
+Klient Socket.io jest **doładowywany dynamicznie** z originu backendu przez
+[`script/realtime.js`](script/realtime.js). Wcześniej dashboardy ładowały go
+z `/socket.io/socket.io.js`, czyli ścieżki względnej wobec strony — na Pages
+taki adres nie istnieje.
+
+### n8n
+
+Backend woła n8n **po stronie serwera**, więc n8n nie musi być wystawiony
+publicznie. Gdy działa na tej samej maszynie, wystarczy pętla zwrotna:
+
+```
+N8N_WEBHOOK_URL=http://127.0.0.1:5678/webhook/triage
+```
+
+Ruch nie opuszcza wtedy serwera, a edytor n8n pozostaje dostępny wyłącznie
+lokalnie lub przez LAN/VPN — to najmniejsza możliwa powierzchnia ataku.
+
+### Uruchamianie jako usługa (Windows)
+
+[`backend/tools/start-zdrovia.ps1`](backend/tools/start-zdrovia.ps1) startuje serwer
+i pisze log do `backend/logs/backend-RRRR-MM-DD.log` (starsze niż 14 dni są
+kasowane przy starcie). Rejestracja w harmonogramie zadań:
+
+```powershell
+$action  = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument '-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "C:\Sklep\zdrovia\backend\tools\start-zdrovia.ps1"'
+$trigger = New-ScheduledTaskTrigger -AtStartup
+$princ   = New-ScheduledTaskPrincipal -UserId 'SYSTEM' -LogonType ServiceAccount -RunLevel Highest
+$set     = New-ScheduledTaskSettingsSet -ExecutionTimeLimit ([TimeSpan]::Zero) -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1) -StartWhenAvailable
+Register-ScheduledTask -TaskName 'Zdrovia Backend' -Action $action -Trigger $trigger -Principal $princ -Settings $set
+```
+
+### Uwaga o portach na Windows (HTTP.sys)
+
+Jeśli port jest zajęty przez IIS, Node zwróci **`EACCES`**, a nie `EADDRINUSE` —
+HTTP.sys rezerwuje go na poziomie jądra, także dla bindingów z nagłówkiem hosta.
+Listę rezerwacji pokazuje:
+
+```
+netsh int ipv4 show excludedportrange protocol=tcp
+```
+
+Port z tej listy jest nie do użycia przez Node — trzeba wybrać inny albo
+postawić przed aplikacją odwrotne proxy (IIS z ARR + URL Rewrite).
+
+---
+
 ## Czego brakuje do wersji produkcyjnej
 
 - **Integracja z e-zdrowie (P1)** — realne wystawianie e-recept, e-skierowań i e-zwolnień (L4).

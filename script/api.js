@@ -1,7 +1,7 @@
 /* =============================================================
    api.js
    Klient REST API backendu Zdrovia. Obsługuje:
-   - automatyczny wybór adresu API (ten sam origin :4000 albo dev),
+   - adres API pochodzi z config.js (same-origin lub osobny serwer),
    - JWT: httpOnly cookie (credentials: include) ORAZ token w
      nagłówku Authorization jako fallback (np. gdy front jest
      serwowany z innego origin niż API) — patrz README (bezpieczeństwo),
@@ -12,9 +12,12 @@
 (function () {
   "use strict";
 
-  // Jeśli frontend serwuje backend (port 4000) → ten sam origin.
-  const SAME_ORIGIN = location.port === "4000";
-  const API_BASE = SAME_ORIGIN ? "/api" : "http://localhost:4000/api";
+  // Adres API ustala config.js (ładowany wcześniej) — frontend bywa
+  // hostowany na innym origin niż backend (GitHub Pages → własny serwer).
+  // Fallback na wypadek braku config.js: lokalny backend deweloperski.
+  const CFG = window.ZDROVIA_CONFIG || { apiBase: "http://localhost:4000/api", sameOrigin: false };
+  const SAME_ORIGIN = Boolean(CFG.sameOrigin);
+  const API_BASE = CFG.apiBase;
   const TOKEN_KEY = "zdrovia_token";
 
   const getToken = () => {

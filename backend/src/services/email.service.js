@@ -13,6 +13,17 @@ const settings = require("./settings.service");
 
 const BRAND = "#0E9F8E";
 
+/* Buduje link do panelu pacjenta. Frontend bywa hostowany osobno od API
+   (GitHub Pages), więc adres bierzemy z PUBLIC_FRONTEND_URL; bez niej
+   wracamy do PUBLIC_APP_URL (backend serwuje też statyki), a w ostatniej
+   kolejności do lokalnego serwera deweloperskiego. */
+function frontendUrl(pathWithHash) {
+  const base = String(
+    process.env.PUBLIC_FRONTEND_URL || process.env.PUBLIC_APP_URL || "http://localhost:4000"
+  ).replace(new RegExp("/+$"), "");
+  return base + "/" + String(pathWithHash).replace(new RegExp("^/+"), "");
+}
+
 function buildTransport() {
   const host = settings.get("smtp_host");
   const port = parseInt(settings.get("smtp_port"), 10) || 587;
@@ -78,7 +89,7 @@ function tplAppointment(appt, patient, doctor, heading) {
       row("Termin", `${appt.date}, godz. ${appt.time}`) +
       row("Forma", appt.consultationType || "wideo")
     )}
-    ${btn("http://localhost:4000/dashboard-patient.html#wizyty", "Zobacz w panelu")}`);
+    ${btn(frontendUrl("dashboard-patient.html#wizyty"), "Zobacz w panelu")}`);
 }
 
 function tplPrescription(presc, patient, doctor) {
@@ -91,7 +102,7 @@ function tplPrescription(presc, patient, doctor) {
       row("Kod e-recepty", presc.code) +
       row("Ważna do", presc.validUntil || "—")
     )}
-    ${btn("http://localhost:4000/dashboard-patient.html#recepty", "Zobacz receptę")}`);
+    ${btn(frontendUrl("dashboard-patient.html#recepty"), "Zobacz receptę")}`);
 }
 
 /* ---------- API ---------- */
