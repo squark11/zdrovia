@@ -409,10 +409,18 @@ Kolejność rozstrzygania:
 1. `window.ZDROVIA_API_ORIGIN` ustawione ręcznie przed skryptem,
 2. parametr `?api=https://...` w adresie (doraźne testy innego backendu),
 3. `file://` lub port typowego serwera statycznego (`8123`, `5173`, …) → `DEV_API_ORIGIN`,
-4. inny port na `localhost` → **ten sam origin** (backend serwuje też statyki),
-5. dowolny inny host → `PRODUCTION_API_ORIGIN`.
+4. host z listy `STATIC_HOSTS` (GitHub Pages) → `PRODUCTION_API_ORIGIN`,
+5. każdy inny przypadek → **ten sam origin co strona**.
 
-Zmiana adresu produkcyjnego API = edycja jednej stałej na górze tego pliku.
+Punkt 5 jest domyślny celowo. Frontend trafia tylko w dwa miejsca: na hosting
+statyczny albo do samego backendu, który obok `/api` serwuje te pliki. Skoro
+więc strona nie przyszła z hostingu statycznego, serwował ją backend — i API
+leży pod tym samym adresem. Dzięki temu panel działa pod `localhost`, pod
+adresem LAN i pod nazwą publiczną, **także zanim backend dostanie certyfikat**
+i stoi jeszcze na HTTP.
+
+Zmiana adresu produkcyjnego API albo hostingu frontendu = edycja jednej
+ze stałych na górze tego pliku.
 
 ### HTTPS jest wymagany, nie opcjonalny
 
