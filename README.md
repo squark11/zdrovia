@@ -449,6 +449,56 @@ Bez tych zmiennych serwer wstaje po HTTP i wypisuje ostrzeżenie w logu.
 Błąd odczytu certyfikatu **przerywa start** — nie ma cichego fallbacku na HTTP,
 żeby nie wystawić tokenów i danych medycznych nieszyfrowanym łączem.
 
+### Wariant wdrożony: TLS kończy IIS, Node stoi za proxy
+
+Na serwerze produkcyjnym certyfikat Let's Encrypt dla `oferty.elmax.net` został
+wydany przez win-acme z **nieeksportowalnym kluczem prywatnym** — Node nie może
+go użyć, bo potrzebuje materiału klucza, a `Export-PfxCertificate` odmawia.
+IIS tego ograniczenia nie ma: sięga po certyfikat w magazynie Windows przez
+**odcisk palca**, bez eksportu. Dlatego TLS kończy IIS, a Node dostaje ruch
+po pętli zwrotnej.
+
+Układ:
+
+```
+przeglądarka ──HTTPS:45003──▶ IIS (witryna Zdrovia, ARR)
+                                  │
+                                  └──HTTP──▶ Node 127.0.0.1:4000
+```
+
+Elementy po stronie IIS:
+
+- witryna **Zdrovia**, pula aplikacji **ZdroviaProxy** (osobna, żeby nie dzielić
+  procesu roboczego z witryną produkcyjną), katalog `C:\inetpub\zdrovia`
+  zawierający wyłącznie `web.config`,
+- binding `https *:45003:oferty.elmax.net` z SNI,
+- wpis HTTP.sys wskazujący ten sam certyfikat co port 45002, dodany własnym
+  `appid` — dzięki temu skrypt win-acme zarządzający bindingiem 45002 nigdy
+  nie ruszy wpisu dla 45003,
+- reguła URL Rewrite z adresem bezwzględnym w akcji, co uruchamia proxy ARR.
+
+Po stronie backendu: `PORT=4000`, `HOST=127.0.0.1`. Nasłuch tylko lokalny —
+Node jest nieosiągalny z sieci inaczej niż przez IIS. Zmienne `SSL_*` pozostają
+puste; serwer wykrywa nasłuch na pętli zwrotnej i nie ostrzega o braku TLS.
+
+**Sekcja `webSocket` w `web.config`.** Nie deklarujemy jej, mimo że Socket.io
+wymaga WebSocketów. Na tym serwerze sekcja jest zablokowana do nadpisywania
+(`overrideModeDefault="Deny"`) i próba jej użycia kończy się błędem
+**HTTP 500.19**. Odblokowanie byłoby zmianą globalną — niepotrzebną, bo
+globalnie WebSocket jest już włączony.
+
+**Odnowienie certyfikatu zrywa binding.** Wpis HTTP.sys wskazuje konkretny
+odcisk palca, a odnowienie wydaje certyfikat z nowym. Skrypt win-acme dla
+witryny produkcyjnej aktualizuje tylko swój port. Dlatego po każdym odnowieniu
+trzeba uruchomić [`backend/tools/rebind-45003-cert.ps1`](backend/tools/rebind-45003-cert.ps1) —
+jest idempotentny i dotyka wyłącznie portu 45003.
+
+Skrypt odrzuca certyfikaty **self-signed** i wymaga, żeby łańcuch zaufania dał
+się zbudować. To nie jest ostrożność na wyrost: w magazynie leży self-signed
+certyfikat dla tej samej nazwy z *późniejszą* datą ważności niż ten od Let's
+Encrypt, więc samo sortowanie po `NotAfter` wybrałoby właśnie jego — a wtedy
+przeglądarki odrzuciłyby połączenie.
+
 ### Ciasteczka a inny origin
 
 Przy froncie na osobnym hoście przeglądarka **nie wyśle** ciasteczka

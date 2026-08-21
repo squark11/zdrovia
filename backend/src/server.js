@@ -202,9 +202,17 @@ server.listen(PORT, HOST, () => {
   console.log(`  Real-time (Socket.io): aktywne`);
   console.log(`  CORS origins: ${allowedOrigins.join(", ") || "(brak)"}`);
   console.log("");
-  if (!tls) {
+  // Nasluch wylacznie na petli zwrotnej oznacza, ze przed serwerem stoi
+  // odwrotne proxy konczace TLS (u nas IIS na porcie 45003). Brak wlasnego
+  // certyfikatu nie jest wtedy problemem - ostrzegamy tylko wtedy, gdy Node
+  // jest wystawiony bezposrednio i naprawde idzie po HTTP.
+  const behindProxy = HOST === "127.0.0.1" || HOST === "::1" || HOST === "localhost";
+  if (!tls && behindProxy) {
+    console.log("  TLS konczy odwrotne proxy; Node slucha tylko lokalnie.");
+    console.log("");
+  } else if (!tls) {
     console.log("  [uwaga] Brak TLS. Frontend serwowany po HTTPS (np. GitHub Pages) nie");
-    console.log("          połączy się z tym API — przeglądarka zablokuje mixed content.");
+    console.log("          polaczy sie z tym API - przegladarka zablokuje mixed content.");
     console.log("");
   }
 });
