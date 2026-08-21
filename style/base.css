@@ -31,9 +31,16 @@
   --c-surface:    #FFFFFF;   /* karty */
   --c-ink-invert: #FFFFFF;
   --c-glass:      rgba(255, 255, 255, 0.9);  /* półprzezroczyste sticky nagłówki */
+  --c-skeleton-base: #EEF4F2;  /* tło szkieletonów ładowania */
+  --c-skeleton-hl:   #E2ECE9;  /* rozbłysk (shimmer) */
 
   /* Kolor gwiazdek oceny */
   --c-star: #FFB020;
+
+  /* Kolory serii wykresów (kodowanie danych — adaptują się do motywu) */
+  --c-chart-ok:     #12805A;   /* zrealizowane / pozytywne */
+  --c-chart-info:   #1B5FAF;   /* zaplanowane / neutralne */
+  --c-chart-danger: #9A5252;   /* anulowane / negatywne */
 
   /* Typografia */
   --font-sans: "Plus Jakarta Sans", system-ui, -apple-system,
@@ -101,8 +108,15 @@
   --c-surface:    #15211E;   /* karty */
   --c-ink-invert: #FFFFFF;   /* tekst na wypełnieniu marki */
   --c-glass:      rgba(14, 25, 23, 0.85);
+  --c-skeleton-base: #1B2724;
+  --c-skeleton-hl:   #253330;
 
   --c-star: #FFC24D;
+
+  /* Serie wykresów — rozjaśnione pod ciemne tło (kontrast AA) */
+  --c-chart-ok:     #43C795;
+  --c-chart-info:   #6FA9EF;
+  --c-chart-danger: #CE9393;
 
   /* Cienie głębsze (na ciemnym tle liczy się czerń, nie zieleń) */
   --shadow-sm:  0 1px 2px rgba(0, 0, 0, 0.4);
@@ -111,12 +125,22 @@
   --shadow-lg:  0 24px 60px rgba(0, 0, 0, 0.6);
 }
 
+/* Podczas przełączania motywu wyłączamy transycje — zmiana jest natychmiastowa
+   (bez animacji kolorów całej strony). Klasa dodawana/zdejmowana w theme.js. */
+.theme-no-transition, .theme-no-transition * {
+  transition: none !important;
+}
+
 /* Nadpisania powierzchni z zahardkodowanymi kolorami (tryb jasny bez zmian).
    Grupujemy wg znaczenia: błąd / sukces / info / anulowane / ostrzeżenie. */
 :root[data-theme="dark"] .alert--error,
 :root[data-theme="dark"] .triage-urgent {
   background: #351E1D; color: #F3A9A0; border-color: #5A2D2B;
 }
+:root[data-theme="dark"] .side-nav__logout:hover,
+:root[data-theme="dark"] .bottom-nav__logout:hover { background: #351E1D; }
+/* Stopka jest ciemna w OBU motywach — nie może się odwrócić przez var(--c-ink). */
+:root[data-theme="dark"] .site-footer { background: #0A1613; }
 :root[data-theme="dark"] .alert--success,
 :root[data-theme="dark"] .badge--today,
 :root[data-theme="dark"] .status--zrealizowana {

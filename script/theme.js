@@ -24,7 +24,11 @@
 
   function apply(theme, persist) {
     const t = theme === "dark" ? "dark" : "light";
+    // Wyłącz transycje na czas zmiany motywu → natychmiastowe przełączenie
+    // (bez animacji kolorów całej strony), przywróć w kolejnej klatce.
+    root.classList.add("theme-no-transition");
     root.setAttribute("data-theme", t);
+    requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove("theme-no-transition")));
     if (persist) { try { localStorage.setItem(KEY, t); } catch (_e) {} }
     syncButtons();
   }

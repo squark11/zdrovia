@@ -68,13 +68,21 @@
 
 /* Szkieletony (skeleton) ładowania */
 .skeleton {
-  background: linear-gradient(90deg, #eef4f2 25%, #e2ece9 37%, #eef4f2 63%);
+  background: linear-gradient(90deg,
+              var(--c-skeleton-base) 25%,
+              var(--c-skeleton-hl) 37%,
+              var(--c-skeleton-base) 63%);
   background-size: 400% 100%;
   animation: shimmer 1.3s ease infinite;
   border-radius: var(--radius);
 }
 .skeleton--line { height: 14px; margin: 8px 0; }
 @keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+
+/* Bez ruchu (prefers-reduced-motion): szkielet zostaje statyczny, ale widoczny. */
+@media (prefers-reduced-motion: reduce) {
+  .skeleton { animation: none; background: var(--c-skeleton-base); }
+}
 
 /* -------------------------------------------------------------
    AUTH — logowanie / rejestracja

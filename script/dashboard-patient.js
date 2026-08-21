@@ -103,7 +103,7 @@
     if (!quiet) {
       el("appt-grid").innerHTML = skeletons(4);
       el("rx-grid").innerHTML = skeletons(3);
-      el("next-visit").innerHTML = '<div class="loading-row"><span class="spinner"></span> Wczytywanie…</div>';
+      el("next-visit").innerHTML = '<div class="skeleton" style="height:104px"></div>';
     }
     try {
       const [a, p] = await Promise.all([api.get("/appointments"), api.get("/prescriptions")]);

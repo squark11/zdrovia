@@ -107,7 +107,7 @@
   /* ---------- Ładowanie ---------- */
   async function loadAll(quiet) {
     if (!quiet) {
-      el("today-list").innerHTML = '<div class="loading-row"><span class="spinner"></span> Wczytywanie…</div>';
+      el("today-list").innerHTML = skeletons(2);
       el("cal-list").innerHTML = skeletons(3);
     }
     try {
@@ -525,22 +525,22 @@
       const h = (v / max) * 118;
       const x = i * slotW + (slotW - bw) / 2;
       const y = 150 - h;
-      bars += `<rect x="${x}" y="${y}" width="${bw}" height="${Math.max(h, 2)}" rx="6" fill="#0E9F8E"></rect>` +
-              `<text x="${x + bw / 2}" y="${y - 6}" text-anchor="middle" font-size="13" font-weight="700" fill="#14312D">${v}</text>` +
-              `<text x="${x + bw / 2}" y="170" text-anchor="middle" font-size="11" fill="#64756F">${labels[i]}</text>`;
+      bars += `<rect class="chart-bar" x="${x}" y="${y}" width="${bw}" height="${Math.max(h, 2)}" rx="6"></rect>` +
+              `<text class="chart-val" x="${x + bw / 2}" y="${y - 6}" text-anchor="middle" font-size="13">${v}</text>` +
+              `<text class="chart-label" x="${x + bw / 2}" y="170" text-anchor="middle">${labels[i]}</text>`;
     });
     el("chart-weeks").innerHTML =
       `<svg class="chart" viewBox="0 0 ${W} 180" role="img" aria-label="Wizyty w ostatnich 4 tygodniach">
-         <line x1="0" y1="150" x2="${W}" y2="150" stroke="#E2ECE9" stroke-width="1"/>${bars}</svg>`;
+         <line class="chart-axis" x1="0" y1="150" x2="${W}" y2="150"/>${bars}</svg>`;
 
     // Rozkład wg statusu (paski proporcji).
     const c = { zrealizowana: 0, zaplanowana: 0, anulowana: 0 };
     appointments.forEach((a) => { if (c[a.status] != null) c[a.status]++; });
     const total = Math.max(1, appointments.length);
     const rows = [
-      ["zrealizowana", "Zrealizowane", "#12805A"],
-      ["zaplanowana", "Zaplanowane", "#1B5FAF"],
-      ["anulowana", "Anulowane", "#9A5252"],
+      ["zrealizowana", "Zrealizowane", "var(--c-chart-ok)"],
+      ["zaplanowana", "Zaplanowane", "var(--c-chart-info)"],
+      ["anulowana", "Anulowane", "var(--c-chart-danger)"],
     ];
     el("chart-status").innerHTML = rows.map(([k, label, color]) => {
       const v = c[k], pct = Math.round((v / total) * 100);

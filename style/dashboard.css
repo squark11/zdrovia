@@ -446,6 +446,7 @@
 .chart-bar { fill: var(--c-primary); }
 .chart-axis { stroke: var(--c-line); stroke-width: 1; }
 .chart-label { fill: var(--c-ink-muted); font-size: 11px; }
+.chart-val { fill: var(--c-ink); font-weight: 700; }
 
 /* =============================================================
    USTAWIENIA PLATFORMY (admin)

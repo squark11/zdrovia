@@ -21,9 +21,19 @@ Wymagania: **Node.js ≥ 18** (testowane na 22).
 
 ```bash
 cd backend
-npm install        # instalacja zależności
-npm run seed       # wypełnienie bazy danymi demo (12 lekarzy + pacjent)
-npm run dev        # start serwera (nodemon) — http://localhost:4000
+npm install                    # instalacja zależności
+cp .env.example .env           # konfiguracja (uzupełnij sekrety — patrz niżej)
+npm run seed                   # dane demo (12 lekarzy + pacjent)
+npm run seed:admin             # konto administratora (z ADMIN_EMAIL/ADMIN_PASSWORD)
+npm run dev                    # start serwera (nodemon) — http://localhost:4000
+```
+
+**WYMAGANE przed startem:** w `.env` ustaw `ENCRYPTION_KEY` (32 bajty = 64 znaki hex).
+Bez niego serwer **nie wystartuje** (szyfruje sekrety konfiguracyjne — patrz
+[Bezpieczeństwo sekretów](#bezpieczeństwo-sekretów-konfiguracyjnych)). Wygeneruj:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
 Następnie otwórz **http://localhost:4000** — backend serwuje jednocześnie API
@@ -32,12 +42,13 @@ bez konfiguracji CORS).
 
 Alternatywnie `npm start` uruchamia serwer bez nodemona.
 
-### Konta demo (po `npm run seed`)
+### Konta demo (po `npm run seed` / `npm run seed:admin`)
 
 | Rola    | E-mail                       | Hasło       |
 |---------|------------------------------|-------------|
 | Pacjent | `pacjent@zdrovia.pl`         | `Haslo123!` |
 | Lekarz  | `anna.kowalska@zdrovia.pl`   | `Haslo123!` |
+| Admin   | `admin@zdrovia.pl` (`ADMIN_EMAIL`) | `Admin123!` (`ADMIN_PASSWORD`) |
 
 Wszyscy lekarze mają hasło `Haslo123!` i e-mail w formacie
 `imie.nazwisko@zdrovia.pl` (np. `maria.wisniewska@zdrovia.pl`).
@@ -103,8 +114,11 @@ zdrowie24.pl/
 
 ### Model danych (tabele)
 
-`users`, `patient_profiles`, `doctor_profiles`, `appointments`, `prescriptions`,
-`availability` — zgodnie ze specyfikacją zadania (szczegóły w `backend/src/db/index.js`).
+`users` (role `patient|doctor|admin`, `is_suspended`), `patient_profiles`,
+`doctor_profiles` (`verification_status`), `appointments` (`reminder_sent`),
+`prescriptions`, `availability`, `triage_conversations`, `platform_settings`
+(klucz→wartość; sekrety szyfrowane) — szczegóły w
+[`backend/src/db/index.js`](backend/src/db/index.js).
 
 ### Endpointy API (prefiks `/api`)
 
@@ -125,6 +139,22 @@ zdrowie24.pl/
 | `PATCH /appointments/:id` | pacjent/lekarz | Anulowanie / oznaczenie „zrealizowana" |
 | `GET /prescriptions` | zalogowany | Recepty (wg roli) |
 | `POST /prescriptions` | lekarz | Wystawienie e-recepty do wizyty |
+| `GET /config` | publiczny | Nie-sekretne flagi funkcji (real-time, dark mode) + nazwa aplikacji |
+| `GET /triage` … | publiczny/zalogowany | AI Triage (proxy do n8n) — patrz sekcja niżej |
+| `GET /admin/stats` | admin | Statystyki platformy |
+| `GET /admin/users` `GET /admin/users/:id` | admin | Lista / szczegóły użytkowników |
+| `PATCH /admin/users/:id/status` | admin | Zawieszenie / przywrócenie konta |
+| `GET /admin/doctors/pending` `PATCH /admin/doctors/:id/verify` | admin | Weryfikacja lekarzy |
+| `GET /admin/appointments` `GET /admin/prescriptions` | admin | Wgląd (bez edycji) |
+| `GET /admin/settings` | admin | Ustawienia platformy (**sekrety zamaskowane**) |
+| `PUT /admin/settings` | admin | Zapis ustawień (sekrety szyfrowane; puste pole = bez zmian) |
+| `POST /admin/settings/test-smtp` | admin | Wysyłka testowego e-maila (rate limit 5/15 min) |
+
+Powiadomienia e-mail (potwierdzenie wizyty, nowa e-recepta, przypomnienie o wizycie
+na jutro — cron godzinowy) i aktualizacje **real-time** (Socket.io) wyzwalają się przy
+`POST /appointments`, `PATCH /appointments/:id`, `POST /prescriptions`. Obie funkcje
+respektują flagi z ustawień (`enable_email_notifications`, `enable_realtime`) i są
+owinięte w `try/catch` — ich awaria **nie przerywa** głównej operacji.
 
 ---
 
@@ -145,6 +175,60 @@ zalecane jest oparcie się wyłącznie o httpOnly cookie + ochronę CSRF.
 
 ---
 
+## Bezpieczeństwo sekretów konfiguracyjnych
+
+Ustawienia platformy (panel admina → **Ustawienia**) przechowują dane wrażliwe: hasło
+SMTP oraz sekret webhooka n8n. Chronimy je warstwowo:
+
+- **Szyfrowanie w spoczynku (AES-256-GCM).** Sekrety trafiają do tabeli `platform_settings`
+  wyłącznie w formie zaszyfrowanej, w formacie `iv:authTag:ciphertext` (hex, losowe 96-bit IV
+  na każdą wartość). Implementacja: [`backend/src/services/encryption.service.js`](backend/src/services/encryption.service.js).
+- **Klucz tylko ze środowiska.** `ENCRYPTION_KEY` (32 bajty = 64 znaki hex) czytany jest
+  **wyłącznie** ze zmiennej środowiskowej — nigdy z bazy ani z kodu. Bez poprawnego klucza
+  serwer **nie startuje** (`process.exit(1)` z jasnym komunikatem — patrz
+  [`backend/src/server.js`](backend/src/server.js)), aby nie działać po cichu bez szyfrowania.
+- **Sekrety nie wracają do przeglądarki.** `GET /api/admin/settings` zwraca dla pól sekretnych
+  jedynie `{ secret: true, isSet: <bool> }` — nigdy odszyfrowanej wartości. W UI pole jest
+  zamaskowane (`••••••••`); puste pole przy zapisie **nie nadpisuje** zapisanego sekretu, a
+  przycisk „Wyczyść" ustawia wartość na `NULL`.
+- **Brak wycieków do logów.** Odszyfrowane sekrety nie trafiają do `console.log`, treści błędów
+  ani odpowiedzi API. Błędy SMTP z testu są **kategoryzowane** (np. „błąd uwierzytelniania”,
+  „brak połączenia”) bez ujawniania hasła.
+- **Poza repozytorium.** `.env` oraz plik bazy SQLite (`data/`, `*.db*`) są w
+  [`backend/.gitignore`](backend/.gitignore).
+
+Wygenerowanie klucza: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`.
+Zmienne środowiskowe (w tym `ENCRYPTION_KEY`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`) opisuje
+[`backend/.env.example`](backend/.env.example).
+
+---
+
+## Usprawnienia UX (ustawienia, e-mail, real-time, dark mode, szkieletony)
+
+- **Ustawienia platformy** — sekcja w panelu admina: dane SMTP, integracja n8n, nazwa
+  aplikacji, e-mail wsparcia oraz flagi funkcji (`enable_email_notifications`,
+  `enable_realtime`, `enable_dark_mode_default`). Sekrety szyfrowane (wyżej); konfiguracja
+  czytana w locie z 5-min cache, unieważnianym przy zapisie.
+- **Powiadomienia e-mail** (Nodemailer) — potwierdzenie umówionej wizyty, powiadomienie o
+  nowej e-recepcie oraz **przypomnienie o wizycie na jutro** (cron godzinowy,
+  [`checkReminders.js`](backend/src/scripts/checkReminders.js); kolumna `reminder_sent`
+  gwarantuje jednokrotną wysyłkę). Konfiguracja SMTP z ustawień; wysyłka poza ścieżką
+  odpowiedzi HTTP i w `try/catch`.
+- **Aktualizacje na żywo** (Socket.io) — po zalogowaniu klient dołącza do prywatnego pokoju
+  `user:<id>` (autoryzacja tokenem JWT na handshake). Zdarzenia: `appointment:new`,
+  `appointment:updated` (lekarz), `prescription:new` (pacjent) → toast + odświeżenie widoku
+  bez przeładowania. Łączy się tylko, gdy funkcja jest włączona (`GET /api/config`).
+- **Tryb ciemny** — kolory oparte o zmienne CSS (`:root` + `:root[data-theme="dark"]`, kontrast
+  WCAG AA, nie surowa inwersja). Przełącznik (słońce/księżyc) w nagłówkach; wybór zapisywany
+  w `localStorage`, odczytywany **wcześnie inline-skryptem w `<head>`** (brak mignięcia/FOUC).
+  Priorytet: wybór użytkownika → `prefers-color-scheme` → domyślny motyw platformy. Kolory
+  wykresów również z tokenów (adaptują się do motywu).
+- **Szkieletony i puste stany** — treściowo dopasowane `.skeleton` (shimmer, wyłączany przy
+  `prefers-reduced-motion`) zamiast spinnerów w listach; dopracowane puste stany z ikoną SVG
+  i wezwaniem do działania (CTA).
+
+---
+
 ## Frontend — decyzje projektowe
 
 - **Vanilla JS w modułach IIFE**, luźno powiązanych zdarzeniami (`CustomEvent`); wspólny
@@ -157,8 +241,9 @@ zalecane jest oparcie się wyłącznie o httpOnly cookie + ochronę CSRF.
 - **Interakcje**: filtrowanie i doładowywanie listy lekarzy („Pokaż więcej"), modal profilu
   lekarza z opiniami (focus trap, Escape, deep-link `#lekarz=`), akordeon FAQ, scroll-spy,
   animacje `IntersectionObserver`, walidacje formularzy, responsywne menu.
-- **Dashboardy**: stan ładowania (spinnery), spójne komunikaty błędów z API, kontrola dostępu
-  po stronie klienta (guard) + realna po stronie serwera.
+- **Dashboardy**: stan ładowania (treściowe **szkieletony**), aktualizacje na żywo (Socket.io),
+  tryb ciemny, spójne komunikaty błędów z API, kontrola dostępu po stronie klienta (guard)
+  + realna po stronie serwera.
 - **Kreator rezerwacji** ([umow.html](umow.html)) — wieloetapowy formularz w stylu „Zaufanego
   Lekarza": usługa (E-konsultacja / E-recepta / E-zwolnienie L4 / E-skierowanie) → lekarz →
   termin i forma (wideo/czat/telefon) → powód + kwestionariusz zależny od usługi → **płatność**.

@@ -572,7 +572,12 @@
 }
 .theme-toggle:hover { color: var(--c-primary-dark); border-color: var(--c-primary); }
 .theme-toggle svg { width: 19px; height: 19px; }
-.theme-toggle .ico-sun { display: none; }
-.theme-toggle .ico-moon { display: block; }
-:root[data-theme="dark"] .theme-toggle .ico-sun { display: block; }
-:root[data-theme="dark"] .theme-toggle .ico-moon { display: none; }
+
+/* Zamiana ikony wg trybu (działa dla przycisku kołowego i wiersza w menu) */
+[data-theme-toggle] .ico-sun { display: none; }
+[data-theme-toggle] .ico-moon { display: block; }
+:root[data-theme="dark"] [data-theme-toggle] .ico-sun { display: block; }
+:root[data-theme="dark"] [data-theme-toggle] .ico-moon { display: none; }
+
+/* Wariant „wiersz" motywu w stopce menu bocznego (jak przycisk wylogowania) */
+.side-nav__theme:hover { background: var(--c-primary-tint); color: var(--c-primary-dark); }
