@@ -460,7 +460,9 @@ i przeglądarka odrzuca odpowiedź.
 ### Publikacja frontendu
 
 [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) publikuje
-statyki przy każdym pushu do `main`. Do `_site/` trafiają wyłącznie HTML, `script/`,
+statyki przy każdym pushu do gałęzi `deploy/github-pages`. `main` pozostaje
+gałęzią kodu — wdrożeniem steruje osobna gałąź, żeby publikacja nie zależała
+od każdego commita w main. Do `_site/` trafiają wyłącznie HTML, `script/`,
 `style/`, `images/` i `assets/` — katalog `backend/` jest wykluczony, a osobny krok
 przerywa build, jeśli w katalogu publikacji pojawi się `.env`, `*.pem`, `*.pfx` lub `*.db`.
 

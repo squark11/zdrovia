@@ -7,7 +7,9 @@ name: Deploy frontend na GitHub Pages
 
 on:
   push:
-    branches: [main]
+    # Publikujemy z galezi deployowej, nie z main - main trzyma kod
+    # aplikacji, a wdrozeniem steruje osobna galaz.
+    branches: [deploy/github-pages]
     paths-ignore:
       - "backend/**"
       - "n8n/**"
